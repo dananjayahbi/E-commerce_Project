@@ -29,7 +29,7 @@ import { Menu, Layout } from "antd";
 import { useNavigate } from "react-router-dom";
 import logo from "../images/logo.png";
 
-const { Header, Footer, Sider, Content } = Layout;
+const { Header, Footer, Sider } = Layout;
 
 const SideMenu = () => {
   const navigate = useNavigate();
@@ -119,8 +119,10 @@ const SideMenu = () => {
       collapsedWidth={0}
     >
       <Layout>
-        <Header style={{ color: "#fff", display: "flex" , justifyContent:"center" }}>
-            <img src={logo} alt="Logo" width="120px" height="100px"/>
+        <Header
+          style={{ color: "#fff", display: "flex", justifyContent: "center" }}
+        >
+          <img src={logo} alt="Logo" width="120px" height="100px" />
         </Header>
       </Layout>
       <Menu
@@ -241,6 +243,26 @@ const SideMenu = () => {
           </Menu.Item>
         </Menu.SubMenu>
       </Menu>
+      <Layout className="side-menu-footer">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems:"center",
+            justifyContent:"center",
+            padding: "50px 15px",
+            textAlign: "center",
+            color:"#fff",
+            backgroundColor: "#001529",
+            position: "fixed",
+            width: "288px",
+            height: "80px",
+            bottom: 0,
+          }}
+        >
+          Ecommerce Dashboard ©2024 <br /> Created by <a href="#">CodeloomTechnologies</a>
+        </div>
+      </Layout>
     </Sider>
   );
 };
