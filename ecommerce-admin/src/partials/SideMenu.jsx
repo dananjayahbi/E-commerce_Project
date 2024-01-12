@@ -128,7 +128,9 @@ const SideMenu = () => {
         onClick={onClick}
         selectedKeys={[current]}
         mode="inline"
-        style={{ paddingTop: "60px" }}
+        style={{
+          paddingTop: "60px",
+        }}
       >
         <Menu.Item key="dashboard" icon={<Gauge size={20} />}>
           Dashboard
