@@ -18,6 +18,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/users", require("./routes/UserRoutes"));
+app.use("/roles", require("./routes/RoleRoutes"));
 
 app.listen(PORT, () => {
   console.log("Server up with port : " + PORT);
