@@ -27,85 +27,86 @@ import {
 } from "lucide-react";
 import { Menu, Layout } from "antd";
 import { useNavigate } from "react-router-dom";
+import logo from "../images/logo.png";
 
-const { Sider } = Layout;
+const { Header, Footer, Sider, Content } = Layout;
 
 const SideMenu = () => {
   const navigate = useNavigate();
   const [current, setCurrent] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
 
-const onClick = (e) => {
+  const onClick = (e) => {
     console.log("click ", e);
     setCurrent(e.key);
 
     // Use navigate to go to the desired page based on the key
     switch (e.key) {
-        case "dashboard":
-            navigate("/");
-            break;
-        case "1":
-            navigate("/products");
-            break;
-        case "2":
-            navigate("/addProduct");
-            break;
-        case "3":
-            navigate("/category");
-            break;
-        case "4":
-            navigate("/units");
-            break;
-        case "5":
-            navigate("/brands");
-            break;
-        case "6":
-            navigate("/orders");
-            break;
-        case "7":
-            navigate("/sales");
-            break;
-        case "8":
-            navigate("/newSale");
-            break;
-        case "9":
-            navigate("/customers");
-            break;
-        case "10":
-            navigate("/users");
-            break;
-        case "11":
-            navigate("/roles");
-            break;
-        case "12":
-            navigate("/salesReport");
-            break;
-        case "13":
-            navigate("/inventoryReport");
-            break;
-        case "14":
-            navigate("/productsReport");
-            break;
-        case "15":
-            navigate("/productQuantityAlerts");
-            break;
-        case "16":
-            navigate("/systemSettings");
-            break;
-        case "17":
-            navigate("/storeSettings");
-            break;
-        case "18":
-            navigate("/emailTemplates");
-            break;
-        case "19":
-            navigate("/backup");
-            break;
-        // Add more cases as needed
-        default:
-            break;
+      case "dashboard":
+        navigate("/");
+        break;
+      case "1":
+        navigate("/products");
+        break;
+      case "2":
+        navigate("/addProduct");
+        break;
+      case "3":
+        navigate("/category");
+        break;
+      case "4":
+        navigate("/units");
+        break;
+      case "5":
+        navigate("/brands");
+        break;
+      case "6":
+        navigate("/orders");
+        break;
+      case "7":
+        navigate("/sales");
+        break;
+      case "8":
+        navigate("/newSale");
+        break;
+      case "9":
+        navigate("/customers");
+        break;
+      case "10":
+        navigate("/users");
+        break;
+      case "11":
+        navigate("/roles");
+        break;
+      case "12":
+        navigate("/salesReport");
+        break;
+      case "13":
+        navigate("/inventoryReport");
+        break;
+      case "14":
+        navigate("/productsReport");
+        break;
+      case "15":
+        navigate("/productQuantityAlerts");
+        break;
+      case "16":
+        navigate("/systemSettings");
+        break;
+      case "17":
+        navigate("/storeSettings");
+        break;
+      case "18":
+        navigate("/emailTemplates");
+        break;
+      case "19":
+        navigate("/backup");
+        break;
+      // Add more cases as needed
+      default:
+        break;
     }
-};
+  };
 
   return (
     <Sider
@@ -117,6 +118,11 @@ const onClick = (e) => {
       breakpoint="md"
       collapsedWidth={0}
     >
+      <Layout>
+        <Header style={{ color: "#fff", display: "flex" , justifyContent:"center" }}>
+            <img src={logo} alt="Logo" width="120px" height="100px"/>
+        </Header>
+      </Layout>
       <Menu
         theme="dark"
         onClick={onClick}
