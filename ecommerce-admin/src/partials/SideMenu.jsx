@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AlertTriangle,
   BarChartBig,
@@ -28,13 +28,25 @@ import {
 import { Menu, Layout } from "antd";
 import { useNavigate } from "react-router-dom";
 import logo from "../images/logo.png";
+import { fetchDashboardLogo } from '../utils/globalExports';
+import errorImage from "../images/error_img.png";
 
-const { Header, Footer, Sider } = Layout;
+const { Header, Sider } = Layout;
 
 const SideMenu = () => {
   const navigate = useNavigate();
   const [current, setCurrent] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
+  const [dashboardLogo, setDashboardLogo] = useState(null);
+
+  useEffect(() => {
+    const getDashboardLogo = async () => {
+      const imageUrl = await fetchDashboardLogo();
+      setDashboardLogo(imageUrl);
+    };
+
+    getDashboardLogo();
+  }, []); // Empty dependency array ensures the effect runs only once after the initial render
 
   const onClick = (e) => {
     console.log("click ", e);
@@ -122,7 +134,7 @@ const SideMenu = () => {
         <Header
           style={{ color: "#fff", display: "flex", justifyContent: "center" }}
         >
-          <img src={logo} alt="Logo" width="120px" height="100px" />
+          <img src={dashboardLogo ? dashboardLogo : errorImage} alt="Logo" width="120px" height="120px" style={{ borderRadius: errorImage ? "20%" : "0" }} />
         </Header>
       </Layout>
       <Menu

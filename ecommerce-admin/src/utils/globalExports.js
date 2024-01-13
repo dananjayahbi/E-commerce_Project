@@ -1,4 +1,16 @@
-const test = 'The experiment was successful !';
-const test2 = 'This is the text 2';
-
-export { test, test2 };
+const fetchDashboardLogo = async () => {
+    try {
+      // Fetch the 'dashboardLogo' image from the backend
+      const response = await fetch(
+        "http://localhost:5000/systemSettings/getDashboardLogo"
+      );
+      if (response.ok) {
+        return URL.createObjectURL(await response.blob());
+      }
+    } catch (error) {
+      console.error("Error fetching dashboardLogo image", error);
+    }
+  };
+  
+  export { fetchDashboardLogo };
+  

@@ -19,6 +19,7 @@ app.get("/", (req, res) => {
 
 app.use("/users", require("./routes/UserRoutes"));
 app.use("/roles", require("./routes/RoleRoutes"));
+app.use("/systemSettings", require("./routes/SystemSettingsRoutes"));
 
 app.listen(PORT, () => {
   console.log("Server up with port : " + PORT);
