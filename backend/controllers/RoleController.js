@@ -75,11 +75,6 @@ const updateRole = async (req, res) => {
         .json({ message: "Role name must be at least 3 characters long" });
     }
 
-    const roleExists = await Role.findOne({ roleName: roleName });
-    if (roleExists) {
-      return res.status(400).json({ message: "Role already exists" });
-    }
-
     let updateData = {
       roleName: roleName ? roleName : role.roleName,
       description: description ? description : role.description,

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Modal, Upload, message } from "antd";
+import errorImage from "../../images/error_img.png";
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -90,7 +91,7 @@ const SingleImageUpload = () => {
         >
           <div style={{ width: "400px", height: "200px", overflow: "hidden", marginBottom:"10px" }}>
             <img
-              src={previewImage}
+              src={previewImage? previewImage : errorImage}
               alt="Preview"
               style={{ width: "100%", height: "100%", objectFit: "contain" }}
             />

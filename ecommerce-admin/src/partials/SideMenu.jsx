@@ -27,7 +27,6 @@ import {
 } from "lucide-react";
 import { Menu, Layout } from "antd";
 import { useNavigate } from "react-router-dom";
-import logo from "../images/logo.png";
 import { fetchDashboardLogo } from '../utils/globalExports';
 import errorImage from "../images/error_img.png";
 
@@ -255,26 +254,6 @@ const SideMenu = () => {
           </Menu.Item>
         </Menu.SubMenu>
       </Menu>
-      <Layout className="side-menu-footer">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems:"center",
-            justifyContent:"center",
-            padding: "50px 15px",
-            textAlign: "center",
-            color:"#fff",
-            backgroundColor: "#001529",
-            position: "fixed",
-            width: "288px",
-            height: "80px",
-            bottom: 0,
-          }}
-        >
-          Ecommerce Dashboard ©2024 <br /> Created by <a href="#">CodeloomTechnologies</a>
-        </div>
-      </Layout>
     </Sider>
   );
 };

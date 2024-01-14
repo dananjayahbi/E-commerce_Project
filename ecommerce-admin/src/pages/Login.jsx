@@ -33,8 +33,14 @@ const Login = () => {
         values
       );
       console.log("Login successful", response.data);
-      window.localStorage.setItem("token", response.data);
+  
+      // Store only the token in local storage
+      window.localStorage.setItem("token", response.data.token);
+      
+      // Set LoggedIn to true
       window.localStorage.setItem("LoggedIn", true);
+  
+      console.log(localStorage.getItem("token"));
       window.location.href = "/";
     } catch (error) {
       console.error("Login failed", error);
@@ -43,6 +49,7 @@ const Login = () => {
       setSubmitting(false);
     }
   };
+  
 
   return (
     <Container

@@ -1,6 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout } from "antd";
 import SideMenu from "../partials/SideMenu";
+import Footer from "../partials/Footer";
+import Header from "../partials/Header";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home";
 import Products from "../pages/ProductsManagement/Products";
@@ -17,16 +19,18 @@ import Roles from "../pages/UserManagement/Roles";
 import SalesReport from "../pages/Reports/SalesReport";
 import InventoryReport from "../pages/Reports/InventoryReport";
 import ProductsReport from "../pages/Reports/ProductsReport";
-import PeoductQuantityAlerts from "../pages/Reports/PeoductQuantityAlerts";
+import ProductQuantityAlerts from "../pages/Reports/PeoductQuantityAlerts";
 import SystemSettings from "../pages/Settings/SystemSettings";
 import StoreSettings from "../pages/Settings/StoreSettings";
 import EmailTemplates from "../pages/Settings/EmailTemplates";
 import Backup from "../pages/Settings/Backup";
+import LowWidth from "../pages/LowWidth";
 
-const { Content } = Layout;
+const { Content, Header: AntHeader, Footer: AntFooter } = Layout;
 
 const Dashboard = () => {
   const isLogged = window.localStorage.getItem("LoggedIn");
+  const [redirectToError, setRedirectToError] = useState(false);
 
   // If not logged in, redirect to login page
   useEffect(() => {
@@ -48,42 +52,75 @@ const Dashboard = () => {
     };
   }, [500]);
 
-  if (isLogged == "false") {
+  useEffect(() => {
+    const handleResize = () => {
+      const deviceWidth = window.innerWidth;
+      if (!redirectToError && deviceWidth < 768) {
+        setRedirectToError(true);
+      } else if (redirectToError && deviceWidth >= 768) {
+        setRedirectToError(false);
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [redirectToError]);
+
+  if (isLogged === "false") {
     // If not logged in, redirect to login page
     return <Navigate to="/login" />;
   }
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <SideMenu />
-      <Layout>
-        <Content style={{ padding: "50px" }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/addProduct" element={<AddProduct />} />
-            <Route path="/category" element={<Category />} />
-            <Route path="/units" element={<Units />} />
-            <Route path="/brands" element={<Brands />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/sales" element={<Sales />} />
-            <Route path="/newSale" element={<NewSale />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/roles" element={<Roles />} />
-            <Route path="/salesReport" element={<SalesReport />} />
-            <Route path="/inventoryReport" element={<InventoryReport />} />
-            <Route path="/productsReport" element={<ProductsReport />} />
-            <Route path="/productQuantityAlerts" element={<PeoductQuantityAlerts />} />
-            <Route path="/systemSettings" element={<SystemSettings />} />
-            <Route path="/storeSettings" element={<StoreSettings />} />
-            <Route path="/emailTemplates" element={<EmailTemplates />} />
-            <Route path="/backup" element={<Backup />} />
-          </Routes>
-        </Content>
-      </Layout>
+      {!redirectToError && (
+        <>
+          <SideMenu />
+          <Layout>
+            <Header />
+            <Content style={{ padding: "50px" }}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/addProduct" element={<AddProduct />} />
+                <Route path="/category" element={<Category />} />
+                <Route path="/units" element={<Units />} />
+                <Route path="/brands" element={<Brands />} />
+                <Route path="/orders" element={<Orders />} />
+                <Route path="/sales" element={<Sales />} />
+                <Route path="/newSale" element={<NewSale />} />
+                <Route path="/customers" element={<Customers />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/roles" element={<Roles />} />
+                <Route path="/salesReport" element={<SalesReport />} />
+                <Route path="/inventoryReport" element={<InventoryReport />} />
+                <Route path="/productsReport" element={<ProductsReport />} />
+                <Route
+                  path="/productQuantityAlerts"
+                  element={<ProductQuantityAlerts />}
+                />
+                <Route path="/systemSettings" element={<SystemSettings />} />
+                <Route path="/storeSettings" element={<StoreSettings />} />
+                <Route path="/emailTemplates" element={<EmailTemplates />} />
+                <Route path="/backup" element={<Backup />} />
+              </Routes>
+            </Content>
+            <AntFooter>
+              <Footer />
+            </AntFooter>
+          </Layout>
+        </>
+      )}
+  
+      {redirectToError && <LowWidth />} {/* Render LowWidth page conditionally */}
     </Layout>
   );
+  
 };
 
 export default Dashboard;
