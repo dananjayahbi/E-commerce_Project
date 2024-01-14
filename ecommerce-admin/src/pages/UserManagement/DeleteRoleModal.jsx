@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'antd';
 import axios from 'axios';
+import { AlertTriangle } from 'lucide-react';
 
 const DeleteRoleModal = ({ roleId, visible, onCancel, onDelete }) => {
   const [loading, setLoading] = useState(false);
@@ -41,14 +42,14 @@ const DeleteRoleModal = ({ roleId, visible, onCancel, onDelete }) => {
 
   return (
     <Modal
-      title="Confirm Delete"
+      title="Delete Role"
       visible={visible}
       onCancel={onCancel}
       footer={[
         <Button key="cancel" onClick={onCancel}>
           Cancel
         </Button>,
-        <Button key="delete" type="danger" loading={loading} onClick={handleDelete}>
+        <Button danger key="delete" loading={loading} onClick={handleDelete}>
           Delete
         </Button>,
       ]}

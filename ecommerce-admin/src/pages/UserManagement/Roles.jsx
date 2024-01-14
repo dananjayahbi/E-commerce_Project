@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal } from 'antd';
+import { Table, Button, Modal, Input, Space } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import AddRoleModal from './AddRoleModal';
 import EditRoleModal from './EditRoleModal';
-import DeleteRoleModal from './DeleteRoleModal'; // Import the DeleteRoleModal component
+import DeleteRoleModal from './DeleteRoleModal';
 
 const Roles = () => {
   const [roles, setRoles] = useState([]);
@@ -11,85 +12,115 @@ const Roles = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedRoleId, setSelectedRoleId] = useState(null);
-
-  // State for AddRoleModal
   const [addRoleModalVisible, setAddRoleModalVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const [sortedInfo, setSortedInfo] = useState({});
 
-  const columns = [
-    {
-      title: 'Role Name',
-      dataIndex: 'roleName',
-      key: 'roleName',
+  const handleChange = ( sorter ) => {
+    setSortedInfo(sorter);
+  };
+
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.select());
+      }
     },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (text, record) => (
+    render: (text) =>
+      searchedColumn === dataIndex ? (
         <span>
-          <Button onClick={() => handleEdit(record._id)}>Edit</Button>
-          <Button onClick={() => handleDelete(record._id)}>Delete</Button>
+          {text}
         </span>
+      ) : (
+        text
       ),
-    },
-  ];
+  });
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText('');
+  };
 
   const handleEdit = (roleId) => {
-    // Open edit modal and set the selected role ID
     setEditModalVisible(true);
     setSelectedRoleId(roleId);
   };
 
   const handleDelete = (roleId) => {
-    // Open delete modal and set the selected role ID
     setDeleteModalVisible(true);
     setSelectedRoleId(roleId);
   };
 
   const handleAddNew = () => {
-    // Open AddRoleModal
     setAddRoleModalVisible(true);
   };
 
   const handleAddRoleModalCancel = () => {
-    // Close AddRoleModal
     setAddRoleModalVisible(false);
   };
 
   const handleAddRoleModalAdd = () => {
-    // Handle logic after adding a new role (refresh data, close modal, etc.)
     setAddRoleModalVisible(false);
-    fetchData(); // Refresh data
+    fetchData();
   };
 
   const handleEditRoleModalCancel = () => {
-    // Close EditRoleModal and reset selected role ID
     setEditModalVisible(false);
     setSelectedRoleId(null);
   };
 
   const handleEditRoleModalUpdate = () => {
-    // Handle logic after updating a role (refresh data, close modal, etc.)
     setEditModalVisible(false);
     setSelectedRoleId(null);
-    fetchData(); // Refresh data
+    fetchData();
   };
 
   const handleDeleteRoleModalCancel = () => {
-    // Close DeleteRoleModal and reset selected role ID
     setDeleteModalVisible(false);
     setSelectedRoleId(null);
   };
 
   const handleDeleteRoleModalDelete = () => {
-    // Handle logic after deleting a role (refresh data, close modal, etc.)
     setDeleteModalVisible(false);
     setSelectedRoleId(null);
-    fetchData(); // Refresh data
+    fetchData();
   };
 
   const fetchData = async () => {
@@ -108,13 +139,47 @@ const Roles = () => {
     fetchData();
   }, []);
 
+  const columns = [
+    {
+      title: 'Role Name',
+      dataIndex: 'roleName',
+      key: 'roleName',
+      sorter: (a, b) => a.roleName.localeCompare(b.roleName),
+      sortOrder: sortedInfo.columnKey === 'roleName' && sortedInfo.order,
+      ellipsis: true,
+      ...getColumnSearchProps('roleName'),
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      ellipsis: true,
+      // No search functionality for the "Description" field
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: ( record ) => (
+        <span style={{display:"flex"}}>
+          <Button type='primary' onClick={() => handleEdit(record._id)} style={{marginRight: "5px"}}>Edit</Button>
+          <Button danger onClick={() => handleDelete(record._id)}>Delete</Button>
+        </span>
+      ),
+    },
+  ];
+
   return (
     <div>
       <Button type="primary" onClick={handleAddNew} style={{ marginBottom: 16 }}>
         Add New Role
       </Button>
 
-      <Table columns={columns} dataSource={roles} loading={loading} />
+      <Table
+        columns={columns}
+        dataSource={roles}
+        loading={loading}
+        onChange={handleChange}
+      />
 
       {/* Add New Role Modal */}
       <AddRoleModal
