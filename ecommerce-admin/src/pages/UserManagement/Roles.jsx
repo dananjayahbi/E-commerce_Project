@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Input, Space } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import AddRoleModal from './AddRoleModal';
-import EditRoleModal from './EditRoleModal';
-import DeleteRoleModal from './DeleteRoleModal';
+import React, { useState, useEffect } from "react";
+import { Table, Button, Modal, Input, Space } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import axios from "axios";
+import AddRoleModal from "./AddRoleModal";
+import EditRoleModal from "./EditRoleModal";
+import DeleteRoleModal from "./DeleteRoleModal";
 
 const Roles = () => {
   const [roles, setRoles] = useState([]);
@@ -13,23 +13,30 @@ const Roles = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedRoleId, setSelectedRoleId] = useState(null);
   const [addRoleModalVisible, setAddRoleModalVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const [searchedColumn, setSearchedColumn] = useState('');
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
   const [sortedInfo, setSortedInfo] = useState({});
 
-  const handleChange = ( sorter ) => {
+  const handleChange = (sorter) => {
     setSortedInfo(sorter);
   };
 
   const getColumnSearchProps = (dataIndex) => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
       <div style={{ padding: 8 }}>
         <Input
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Space>
           <Button
@@ -41,14 +48,18 @@ const Roles = () => {
           >
             Search
           </Button>
-          <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+          <Button
+            onClick={() => handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
             Reset
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) =>
       record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
@@ -58,13 +69,7 @@ const Roles = () => {
       }
     },
     render: (text) =>
-      searchedColumn === dataIndex ? (
-        <span>
-          {text}
-        </span>
-      ) : (
-        text
-      ),
+      searchedColumn === dataIndex ? <span>{text}</span> : text,
   });
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -75,7 +80,7 @@ const Roles = () => {
 
   const handleReset = (clearFilters) => {
     clearFilters();
-    setSearchText('');
+    setSearchText("");
   };
 
   const handleEdit = (roleId) => {
@@ -126,10 +131,10 @@ const Roles = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/roles/getRoles');
+      const response = await axios.get("http://localhost:5000/roles/getRoles");
       setRoles(response.data);
     } catch (error) {
-      console.error('Error fetching roles:', error);
+      console.error("Error fetching roles:", error);
     } finally {
       setLoading(false);
     }
@@ -141,28 +146,41 @@ const Roles = () => {
 
   const columns = [
     {
-      title: 'Role Name',
-      dataIndex: 'roleName',
-      key: 'roleName',
+      title: "Role Name",
+      dataIndex: "roleName",
+      key: "roleName",
       sorter: (a, b) => a.roleName.localeCompare(b.roleName),
-      sortOrder: sortedInfo.columnKey === 'roleName' && sortedInfo.order,
+      sortOrder: sortedInfo.columnKey === "roleName" && sortedInfo.order,
       ellipsis: true,
-      ...getColumnSearchProps('roleName'),
+      ...getColumnSearchProps("roleName"),
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
       ellipsis: true,
       // No search functionality for the "Description" field
     },
     {
-      title: 'Actions',
-      key: 'actions',
-      render: ( record ) => (
-        <span style={{display:"flex"}}>
-          <Button type='primary' onClick={() => handleEdit(record._id)} style={{marginRight: "5px"}}>Edit</Button>
-          <Button danger onClick={() => handleDelete(record._id)}>Delete</Button>
+      title: "Actions",
+      key: "actions",
+      render: (record) => (
+        <span
+          style={{
+            display: "flex",
+            flexDirection: window.innerWidth < 870 ? "column" : "row",
+          }}
+        >
+          <Button
+            type="primary"
+            onClick={() => handleEdit(record._id)}
+            style={{ marginRight: "5px", marginBottom: window.innerWidth < 870 ? "5px" : "0px" }}
+          >
+            Edit
+          </Button>
+          <Button danger onClick={() => handleDelete(record._id)}>
+            Delete
+          </Button>
         </span>
       ),
     },
@@ -170,7 +188,11 @@ const Roles = () => {
 
   return (
     <div>
-      <Button type="primary" onClick={handleAddNew} style={{ marginBottom: 16 }}>
+      <Button
+        type="primary"
+        onClick={handleAddNew}
+        style={{ marginBottom: 16 }}
+      >
         Add New Role
       </Button>
 
