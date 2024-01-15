@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Input, Space } from "antd";
+import { Table, Button, Input, Space, Divider } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import axios from "axios";
 import AddRoleModal from "./AddRoleModal";
@@ -174,7 +174,10 @@ const Roles = () => {
           <Button
             type="primary"
             onClick={() => handleEdit(record._id)}
-            style={{ marginRight: "5px", marginBottom: window.innerWidth < 870 ? "5px" : "0px" }}
+            style={{
+              marginRight: "5px",
+              marginBottom: window.innerWidth < 870 ? "5px" : "0px",
+            }}
           >
             Edit
           </Button>
@@ -188,43 +191,47 @@ const Roles = () => {
 
   return (
     <div>
-      <Button
-        type="primary"
-        onClick={handleAddNew}
-        style={{ marginBottom: 16 }}
-      >
-        Add New Role
-      </Button>
+      <span style={{fontSize:"24px", fontWeight:"600"}}>Roles Management</span>
+      <Divider />
+      <div>
+        <Button
+          type="primary"
+          onClick={handleAddNew}
+          style={{ marginBottom: 16 }}
+        >
+          Add New Role
+        </Button>
 
-      <Table
-        columns={columns}
-        dataSource={roles}
-        loading={loading}
-        onChange={handleChange}
-      />
+        <Table
+          columns={columns}
+          dataSource={roles}
+          loading={loading}
+          onChange={handleChange}
+        />
 
-      {/* Add New Role Modal */}
-      <AddRoleModal
-        visible={addRoleModalVisible}
-        onCancel={handleAddRoleModalCancel}
-        onAdd={handleAddRoleModalAdd}
-      />
+        {/* Add New Role Modal */}
+        <AddRoleModal
+          visible={addRoleModalVisible}
+          onCancel={handleAddRoleModalCancel}
+          onAdd={handleAddRoleModalAdd}
+        />
 
-      {/* Edit Role Modal */}
-      <EditRoleModal
-        roleId={selectedRoleId}
-        visible={editModalVisible}
-        onCancel={handleEditRoleModalCancel}
-        onUpdate={handleEditRoleModalUpdate}
-      />
+        {/* Edit Role Modal */}
+        <EditRoleModal
+          roleId={selectedRoleId}
+          visible={editModalVisible}
+          onCancel={handleEditRoleModalCancel}
+          onUpdate={handleEditRoleModalUpdate}
+        />
 
-      {/* Delete Role Modal */}
-      <DeleteRoleModal
-        roleId={selectedRoleId}
-        visible={deleteModalVisible}
-        onCancel={handleDeleteRoleModalCancel}
-        onDelete={handleDeleteRoleModalDelete}
-      />
+        {/* Delete Role Modal */}
+        <DeleteRoleModal
+          roleId={selectedRoleId}
+          visible={deleteModalVisible}
+          onCancel={handleDeleteRoleModalCancel}
+          onDelete={handleDeleteRoleModalDelete}
+        />
+      </div>
     </div>
   );
 };
