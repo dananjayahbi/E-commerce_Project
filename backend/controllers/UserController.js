@@ -137,6 +137,19 @@ const login = async (req, res) => {
       expiresIn: "24h",
     });
 
+    const updateData = {
+      lastLogin: Date.now(),
+    }
+
+    const updateLoginDate = await User.findByIdAndUpdate(user._id, updateData);
+
+    if (!updateLoginDate) {
+      res.status(401).json({
+        data: "Login Date Update Failed!",
+        status: false,
+      });
+    }
+
     res.json({
       token,
       user: { id: user._id, username: user.username, role: user.role },

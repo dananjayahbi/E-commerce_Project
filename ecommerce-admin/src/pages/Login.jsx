@@ -32,14 +32,15 @@ const Login = () => {
         "http://localhost:5000/users/login",
         values
       );
-      console.log("Login successful", response.data);
-  
+
+      console.log("Login successful");
+
       // Store only the token in local storage
       window.localStorage.setItem("token", response.data.token);
-      
+
       // Set LoggedIn to true
       window.localStorage.setItem("LoggedIn", true);
-  
+
       console.log(localStorage.getItem("token"));
       window.location.href = "/";
     } catch (error) {
@@ -49,7 +50,6 @@ const Login = () => {
       setSubmitting(false);
     }
   };
-  
 
   return (
     <Container
