@@ -2,8 +2,70 @@ const User = require("../models/User.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const cloudinary = require('cloudinary').v2;
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
-//Register a user
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+//Global Variables
+let profile_image_url = "";
+let profileImg_local_path = "";
+
+// Upload image to the temp_image folder
+// Define storage for image upload
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../images/temp_images'));
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const fileName = 'profileImage' + ext;
+    cb(null, fileName);
+  },
+});
+
+// Set up multer with the defined storage
+const upload = multer({ storage: storage }).single('profileImage');
+
+const uploadImage = (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      console.error('Error uploading file', err);
+      return res.status(500).json({ success: false, error: 'File upload failed' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+
+    const filePath = path.join(__dirname, '../images/temp_images', req.file.filename);
+    profileImg_local_path = filePath;
+
+    try {
+      // Upload image to Cloudinary
+      // const cloudinaryResponse = await cloudinary.uploader.upload(filePath, { folder: 'profile_images' });
+      // console.log(cloudinaryResponse);
+      // profile_image_url = cloudinaryResponse.url;
+      // console.log(profile_image_url);
+
+      // Delete the local file after successful Cloudinary upload
+      // fs.unlinkSync(filePath);
+
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      console.error('Error uploading image', error);
+      return res.status(500).json({ success: false, error: 'Error uploading image' });
+    }
+  });
+};
+
+//Register
 const register = async (req, res) => {
   try {
     let {
@@ -14,11 +76,10 @@ const register = async (req, res) => {
       password,
       role,
       phoneNumber,
-      profileImage,
       NIC,
     } = req.body;
 
-    //validate
+    // Validate input fields
     if (
       !firstName ||
       !lastName ||
@@ -27,49 +88,48 @@ const register = async (req, res) => {
       !password ||
       !role ||
       !phoneNumber ||
-      !profileImage ||
       !NIC
     ) {
       return res.status(400).json({ message: "Please enter all the fields" });
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res
         .status(400)
-        .json({ message: "Password must be at least 6 characters long" });
+        .json({ message: "Password must be at least 8 characters long" });
     }
 
-    if (phoneNumber.length != 10) {
+    if (phoneNumber.length !== 10) {
       return res
         .status(400)
         .json({ message: "Please enter a valid phone number" });
     }
 
-    if (email.indexOf("@") == -1) {
+    if (email.indexOf("@") === -1) {
       return res
         .status(400)
         .json({ message: "Please enter a valid email address" });
     }
 
-    //check for existing user
+    // Check for existing user
     const existingUserByEmail = await User.findOne({ email: email });
     if (existingUserByEmail) {
       return res
-        .status(400)
+        .status(409)
         .json({ message: "A user with the same email already exists" });
     }
 
     const existingUserByNIC = await User.findOne({ NIC: NIC });
     if (existingUserByNIC) {
       return res
-        .status(400)
+        .status(408)
         .json({ message: "A user with the same NIC already exists" });
     }
 
     const existingUserByUsername = await User.findOne({ username: username });
     if (existingUserByUsername) {
       return res
-        .status(400)
+        .status(406)
         .json({ message: "A user with the same username already exists" });
     }
 
@@ -78,11 +138,20 @@ const register = async (req, res) => {
     const lastLogin = Date.now();
     const fullName = firstName + " " + lastName;
 
-    //hash the password
+    // Hash the password
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
 
-    //save the user
+    // Upload image to Cloudinary
+    const cloudinaryResponse = await cloudinary.uploader.upload(profileImg_local_path, { folder: 'profile_images' });
+    profile_image_url = cloudinaryResponse.url;
+    console.log(profile_image_url);
+
+    // Delete the local file after successful Cloudinary upload
+    fs.unlinkSync(profileImg_local_path);
+    profileImg_local_path = "";
+    
+    // Save the user with Cloudinary image URL
     const newUser = new User({
       fullName,
       username,
@@ -90,7 +159,7 @@ const register = async (req, res) => {
       password: passwordHash,
       role,
       phoneNumber,
-      profileImage,
+      profileImage: profile_image_url,
       NIC,
       isActive,
       registeredDate,
@@ -100,6 +169,7 @@ const register = async (req, res) => {
     const savedUser = await newUser.save();
     res.json(savedUser);
   } catch (error) {
+    console.error('Error registering user:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -136,6 +206,19 @@ const login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "24h",
     });
+
+    const updateData = {
+      lastLogin: Date.now(),
+    }
+
+    const updateLoginDate = await User.findByIdAndUpdate(user._id, updateData);
+
+    if (!updateLoginDate) {
+      res.status(401).json({
+        data: "Login Date Update Failed!",
+        status: false,
+      });
+    }
 
     res.json({
       token,
@@ -449,6 +532,7 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
+  uploadImage,
   register,
   login,
   getNewToken,

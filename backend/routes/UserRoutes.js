@@ -13,6 +13,7 @@ const {
     verifyOTP,
     emailVerify,
     deleteUser,
+    uploadImage,
 } = require('../controllers/UserController');
 
 //REGISTER USER
@@ -47,5 +48,8 @@ router.get('/handleOTP', emailVerify);
 
 //DELETE USER
 router.delete('/deleteUser/:id', protect, deleteUser);
+
+//UPLOAD IMAGE
+router.post('/uploadImage', uploadImage);
 
 module.exports = router;
