@@ -89,9 +89,16 @@ const SingleImageUpload = () => {
             padding: "40px",
           }}
         >
-          <div style={{ width: "400px", height: "200px", overflow: "hidden", marginBottom:"10px" }}>
+          <div
+            style={{
+              width: "400px",
+              height: "200px",
+              overflow: "hidden",
+              marginBottom: "10px",
+            }}
+          >
             <img
-              src={previewImage? previewImage : errorImage}
+              src={previewImage ? previewImage : errorImage}
               alt="Preview"
               style={{ width: "100%", height: "100%", objectFit: "contain" }}
             />
