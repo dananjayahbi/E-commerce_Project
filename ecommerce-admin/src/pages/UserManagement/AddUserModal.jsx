@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Modal, Form, Input, Button, Upload, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { Modal, Form, Input, Button, Upload, message, Select } from "antd";
 import axios from "axios";
 import { UploadOutlined } from "@ant-design/icons";
 
@@ -7,6 +7,21 @@ const AddUserModal = ({ visible, onCancel, onAdd }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
+  const [roles, setRoles] = useState([]);
+
+  useEffect(() => {
+    // Fetch roles from the server
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/roles/getRoles");
+        setRoles(response.data);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   const handleAddUser = async (values) => {
     setLoading(true);
@@ -134,7 +149,13 @@ const AddUserModal = ({ visible, onCancel, onAdd }) => {
           name="role"
           rules={[{ required: true, message: "Please enter the role!" }]}
         >
-          <Input />
+          <Select placeholder="Select a role">
+            {roles.map((role) => (
+              <Option key={role._id} value={role.roleName}>
+                {role.roleName}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
         <Form.Item
           hasFeedback

@@ -1,13 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, Upload, message } from "antd";
+import { Modal, Form, Input, Button, Upload, message, Select } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import axios from "axios";
+
+const { Option } = Select;
 
 const EditUserModal = ({ visible, onCancel, userId, onUpdate }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
   const [profileImagePreview, setProfileImagePreview] = useState(null);
+  const [roles, setRoles] = useState([]);
+
+  useEffect(() => {
+    // Fetch roles from the server
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/roles/getRoles");
+        setRoles(response.data);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   useEffect(() => {
     const fetchUserById = async () => {
@@ -170,9 +187,15 @@ const EditUserModal = ({ visible, onCancel, userId, onUpdate }) => {
         <Form.Item
           name="role"
           label="Role"
-          rules={[{ required: true, message: "Please enter the role" }]}
+          rules={[{ required: true, message: "Please select the role" }]}
         >
-          <Input />
+          <Select placeholder="Select a role">
+            {roles.map((role) => (
+              <Option key={role._id} value={role.roleName}>
+                {role.roleName}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
