@@ -17,6 +17,7 @@ const AddUserModal = ({ visible, onCancel, onAdd }) => {
     });
 
     try {
+      console.log(formData)
       await fetch("http://localhost:5000/users/uploadImage", {
         method: "POST",
         body: formData,

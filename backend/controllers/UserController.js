@@ -2,15 +2,15 @@ const User = require("../models/User.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-const cloudinary = require('cloudinary').v2;
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require("cloudinary").v2;
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 //Global Variables
@@ -21,47 +21,41 @@ let profileImg_local_path = "";
 // Define storage for image upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../images/temp_images'));
+    cb(null, path.join(__dirname, "../images/temp_images"));
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    const fileName = 'profileImage' + ext;
+    const fileName = "profileImage" + ext;
     cb(null, fileName);
   },
 });
 
 // Set up multer with the defined storage
-const upload = multer({ storage: storage }).single('profileImage');
+const upload = multer({ storage: storage }).single("profileImage");
 
 const uploadImage = (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
-      console.error('Error uploading file', err);
-      return res.status(500).json({ success: false, error: 'File upload failed' });
+      console.error("Error uploading file", err);
+      return res
+        .status(500)
+        .json({ success: false, error: "File upload failed" });
     }
 
     if (!req.file) {
-      return res.status(400).json({ success: false, error: 'No file uploaded' });
+      return res
+        .status(400)
+        .json({ success: false, error: "No file uploaded" });
     }
 
-    const filePath = path.join(__dirname, '../images/temp_images', req.file.filename);
+    const filePath = path.join(
+      __dirname,
+      "../images/temp_images",
+      req.file.filename
+    );
     profileImg_local_path = filePath;
 
-    try {
-      // Upload image to Cloudinary
-      // const cloudinaryResponse = await cloudinary.uploader.upload(filePath, { folder: 'profile_images' });
-      // console.log(cloudinaryResponse);
-      // profile_image_url = cloudinaryResponse.url;
-      // console.log(profile_image_url);
-
-      // Delete the local file after successful Cloudinary upload
-      // fs.unlinkSync(filePath);
-
-      return res.status(200).json({ success: true });
-    } catch (error) {
-      console.error('Error uploading image', error);
-      return res.status(500).json({ success: false, error: 'Error uploading image' });
-    }
+    return res.status(200).json({ success: true });
   });
 };
 
@@ -143,14 +137,17 @@ const register = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, salt);
 
     // Upload image to Cloudinary
-    const cloudinaryResponse = await cloudinary.uploader.upload(profileImg_local_path, { folder: 'profile_images' });
+    const cloudinaryResponse = await cloudinary.uploader.upload(
+      profileImg_local_path,
+      { folder: "profile_images" }
+    );
     profile_image_url = cloudinaryResponse.url;
     console.log(profile_image_url);
 
     // Delete the local file after successful Cloudinary upload
     fs.unlinkSync(profileImg_local_path);
     profileImg_local_path = "";
-    
+
     // Save the user with Cloudinary image URL
     const newUser = new User({
       fullName,
@@ -169,7 +166,7 @@ const register = async (req, res) => {
     const savedUser = await newUser.save();
     res.json(savedUser);
   } catch (error) {
-    console.error('Error registering user:', error);
+    console.error("Error registering user:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -209,7 +206,7 @@ const login = async (req, res) => {
 
     const updateData = {
       lastLogin: Date.now(),
-    }
+    };
 
     const updateLoginDate = await User.findByIdAndUpdate(user._id, updateData);
 
@@ -295,21 +292,44 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-//Update a user
+// Update user
 const updateUser = async (req, res) => {
   try {
-    const {
-      fullName,
-      username,
-      email,
-      role,
-      phoneNumber,
-      profileImage,
-      NIC,
-      isActive,
-    } = req.body;
+    const { fullName, username, email, role, phoneNumber, NIC, isActive } =
+      req.body;
 
     const userFetch = await User.findById(req.params.id);
+
+    // Handle image upload similar to registration
+    let newProfileImageUrl = userFetch.profileImage; // default to existing image
+    let publicId = ""; // variable to store the public_id
+
+    // Upload update image to Cloudinary
+    if (profileImg_local_path != "") {
+      const cloudinaryResponse = await cloudinary.uploader.upload(
+        profileImg_local_path,
+        { folder: "profile_images" }
+      );
+      profile_image_url = cloudinaryResponse.url;
+      console.log(profile_image_url);
+
+      // Delete the local file after successful Cloudinary upload
+      fs.unlinkSync(profileImg_local_path);
+      profileImg_local_path = "";
+
+      //Extract the public id of the cloudinary image URL
+      const urlSegments = newProfileImageUrl.split("/");
+      const publicIdIndex = urlSegments.indexOf("profile_images");
+      const publicIdWithExtension = urlSegments.slice(publicIdIndex).join("/");
+      publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+
+      // Delete the existing image from Cloudinary
+      const cloudinaryDeleteResponse = await cloudinary.uploader.destroy(
+        publicId
+      );
+      console.log(cloudinaryDeleteResponse);
+      console.log(profile_image_url);
+    }
 
     let updateData = {
       fullName: fullName ? fullName : userFetch.fullName,
@@ -317,7 +337,9 @@ const updateUser = async (req, res) => {
       email: email ? email : userFetch.email,
       role: role ? role : userFetch.role,
       phoneNumber: phoneNumber ? phoneNumber : userFetch.phoneNumber,
-      profileImage: profileImage ? profileImage : userFetch.profileImage,
+      profileImage: profile_image_url
+        ? profile_image_url
+        : userFetch.profileImage,
       NIC: NIC ? NIC : userFetch.NIC,
       isActive: isActive ? isActive : userFetch.isActive,
       updatedAt: Date.now(),
@@ -326,6 +348,9 @@ const updateUser = async (req, res) => {
     const update = await User.findByIdAndUpdate(req.params.id, updateData);
 
     if (update) {
+      // Console log the public_id extracted from the Cloudinary URL
+      console.log("Public ID:", publicId);
+
       res.status(200).json({
         data: "User updated successfully!",
         status: true,
@@ -510,18 +535,42 @@ const resetPassword = async (req, res) => {
 //Delete user
 const deleteUser = async (req, res) => {
   try {
-    const deleted = await User.findByIdAndDelete(req.params.id);
+    const userFetch = await User.findById(req.params.id);
+    const profile_image = userFetch.profileImage;
 
-    if (deleted) {
-      res.status(200).json({
-        data: "User deleted successfully!",
-        status: true,
-      });
-    } else {
-      res.status(401).json({
-        errorMessage: "Failed deleting the User!\n" + error,
-        status: false,
-      });
+    //Extract the public id of the cloudinary image URL
+    const urlSegments = profile_image.split("/");
+    const publicIdIndex = urlSegments.indexOf("profile_images");
+    const publicIdWithExtension = urlSegments.slice(publicIdIndex).join("/");
+    publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+
+    if (profile_image) {
+      // Delete the existing image from Cloudinary
+      const cloudinaryDeleteResponse = await cloudinary.uploader.destroy(
+        publicId
+      );
+      console.log(cloudinaryDeleteResponse);
+
+      if (cloudinaryDeleteResponse.result === "ok") {
+        const deleted = await User.findByIdAndDelete(req.params.id);
+
+        if (deleted) {
+          res.status(200).json({
+            data: "User deleted successfully!",
+            status: true,
+          });
+        } else {
+          res.status(401).json({
+            errorMessage: "Failed deleting the User!\n" + error,
+            status: false,
+          });
+        }
+      } else {
+        res.status(401).json({
+          errorMessage: "Failed deleting the User!\n" + error,
+          status: false,
+        });
+      }
     }
   } catch (error) {
     res.status(401).json({
