@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'antd';
 import axios from 'axios';
-import { AlertTriangle } from 'lucide-react';
 
 const DeleteRoleModal = ({ roleId, visible, onCancel, onDelete }) => {
   const [loading, setLoading] = useState(false);
