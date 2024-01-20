@@ -292,7 +292,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// Update a user with image upload functionality
+// Update user
 const updateUser = async (req, res) => {
   try {
     const { fullName, username, email, role, phoneNumber, NIC, isActive } =
@@ -535,18 +535,42 @@ const resetPassword = async (req, res) => {
 //Delete user
 const deleteUser = async (req, res) => {
   try {
-    const deleted = await User.findByIdAndDelete(req.params.id);
+    const userFetch = await User.findById(req.params.id);
+    const profile_image = userFetch.profileImage;
 
-    if (deleted) {
-      res.status(200).json({
-        data: "User deleted successfully!",
-        status: true,
-      });
-    } else {
-      res.status(401).json({
-        errorMessage: "Failed deleting the User!\n" + error,
-        status: false,
-      });
+    //Extract the public id of the cloudinary image URL
+    const urlSegments = profile_image.split("/");
+    const publicIdIndex = urlSegments.indexOf("profile_images");
+    const publicIdWithExtension = urlSegments.slice(publicIdIndex).join("/");
+    publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+
+    if (profile_image) {
+      // Delete the existing image from Cloudinary
+      const cloudinaryDeleteResponse = await cloudinary.uploader.destroy(
+        publicId
+      );
+      console.log(cloudinaryDeleteResponse);
+
+      if (cloudinaryDeleteResponse.result === "ok") {
+        const deleted = await User.findByIdAndDelete(req.params.id);
+
+        if (deleted) {
+          res.status(200).json({
+            data: "User deleted successfully!",
+            status: true,
+          });
+        } else {
+          res.status(401).json({
+            errorMessage: "Failed deleting the User!\n" + error,
+            status: false,
+          });
+        }
+      } else {
+        res.status(401).json({
+          errorMessage: "Failed deleting the User!\n" + error,
+          status: false,
+        });
+      }
     }
   } catch (error) {
     res.status(401).json({
