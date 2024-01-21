@@ -6,6 +6,7 @@ import ViewUserModal from "./ViewUserModal";
 import AddUserModal from "./AddUserModal";
 import EditUserModal from "./EditUserModal";
 import DeleteUserModal from "./DeleteUserModal";
+import error_img from "../../images/error_img.png";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -149,7 +150,9 @@ const Users = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/users/getAllUsers");
+      const response = await axios.get(
+        "http://localhost:5000/users/getAllUsers"
+      );
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -163,6 +166,22 @@ const Users = () => {
   }, []);
 
   const columns = [
+    {
+      title: "",
+      dataIndex: "profileImage",
+      key: "profileImage",
+      ellipsis: true,
+      width: 70, // Adjust the width as per your requirement
+      render: (profileImage) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <img
+            src={profileImage ? profileImage : error_img}
+            alt="Avatar"
+            style={{ width: "50px", height: "50px" }}
+          />
+        </div>
+      ),
+    },
     {
       title: "Username",
       dataIndex: "username",
@@ -223,7 +242,9 @@ const Users = () => {
 
   return (
     <div>
-      <span style={{fontSize:"24px", fontWeight:"600"}}>Users Management</span>
+      <span style={{ fontSize: "24px", fontWeight: "600" }}>
+        Users Management
+      </span>
       <Divider />
       <div>
         <Button
@@ -274,6 +295,6 @@ const Users = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Users
+export default Users;
