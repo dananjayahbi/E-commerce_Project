@@ -164,6 +164,21 @@ const Units = () => {
       ...getColumnSearchProps("shortName"),
     },
     {
+      title: "Base Unit",
+      dataIndex: "baseUnit",
+      key: "baseUnit",
+    },
+    {
+      title: "Operator",
+      dataIndex: "operator",
+      key: "operator",
+    },
+    {
+      title: "Operation Value",
+      dataIndex: "operationValue",
+      key: "operationValue",
+    },
+    {
       title: "Actions",
       key: "actions",
       render: (record) => (
