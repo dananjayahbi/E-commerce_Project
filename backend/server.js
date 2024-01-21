@@ -22,6 +22,7 @@ app.use("/roles", require("./routes/RoleRoutes"));
 app.use("/systemSettings", require("./routes/SystemSettingsRoutes"));
 app.use("/units", require("./routes/UnitRoutes"));
 app.use("/brands", require("./routes/BrandRoutes"));
+app.use("/categories", require("./routes/CategoryRoutes"));
 
 app.listen(PORT, () => {
   console.log("Server up with port : " + PORT);
