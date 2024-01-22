@@ -23,6 +23,7 @@ app.use("/systemSettings", require("./routes/SystemSettingsRoutes"));
 app.use("/units", require("./routes/UnitRoutes"));
 app.use("/brands", require("./routes/BrandRoutes"));
 app.use("/categories", require("./routes/CategoryRoutes"));
+app.use("/products", require("./routes/ProductRoutes"));
 
 app.listen(PORT, () => {
   console.log("Server up with port : " + PORT);
