@@ -146,6 +146,22 @@ const Brands = () => {
 
   const columns = [
     {
+      title: "",
+      dataIndex: "imageURL",
+      key: "imageURL",
+      ellipsis: true,
+      width: 70, // Adjust the width as per your requirement
+      render: (profileImage) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <img
+            src={profileImage ? profileImage : error_img}
+            alt="Avatar"
+            style={{ width: "50px", height: "50px" }}
+          />
+        </div>
+      ),
+    },
+    {
       title: "Brand Name",
       dataIndex: "brandName",
       key: "brandName",
@@ -158,11 +174,6 @@ const Brands = () => {
       title: "Description",
       dataIndex: "description",
       key: "description",
-    },
-    {
-      title: "Brand Logo",
-      dataIndex: "imageURL",
-      key: "imageURL",
     },
     {
       title: "Actions",

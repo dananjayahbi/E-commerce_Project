@@ -14,7 +14,7 @@ const brandSchema = new Schema({
   },
   imageURL: {
     type: String,
-    required: true,
+    default: "",
   }
 });
 

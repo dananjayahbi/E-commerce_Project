@@ -6,7 +6,8 @@ const {
     getBrands,
     getBrandById,
     updateBrand,
-    deleteBrand
+    deleteBrand,
+    uploadImage
 } = require('../controllers/BrandController');
 
 //ADD UNIT
@@ -23,5 +24,8 @@ router.put('/updateBrand/:id', protect, updateBrand);
 
 //DELETE UNIT
 router.delete('/deleteBrand/:id', protect, deleteBrand);
+
+//UPLOAD IMAGE
+router.post('/uploadImage', uploadImage);
 
 module.exports = router;
