@@ -26,6 +26,10 @@ const productSchema = new Schema({
     type: String,
     required: true,
   },
+  brand: {
+    type: String,
+    default: "",
+  },
   unit: {
     type: String,
     required: true,
@@ -37,6 +41,10 @@ const productSchema = new Schema({
     min: 0, // Add validation for positive values
   },
   barcodeNumber: {
+    type: Number,
+    default: 0,
+  },
+  stocks: {
     type: Number,
     default: 0,
   },

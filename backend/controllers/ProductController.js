@@ -8,9 +8,11 @@ const addProduct = async (req, res) => {
     featureImage,
     productGallery,
     productCode,
+    brand,
     unit,
     sellingPrice,
     barcodeNumber,
+    stocks,
     notes,
   } = req.body;
   try {
@@ -20,9 +22,11 @@ const addProduct = async (req, res) => {
       featureImage == "" ||
       productGallery == [] ||
       productCode == "" ||
+      brand == "" ||
       unit == "" ||
       sellingPrice == "" ||
       barcodeNumber == "" ||
+      stocks == "" ||
       notes == ""
     ) {
       return res.status(400).json({ message: "Please fill all fields" });
@@ -39,9 +43,11 @@ const addProduct = async (req, res) => {
       featureImage,
       productGallery,
       productCode,
+      brand,
       unit,
       sellingPrice,
       barcodeNumber,
+      stocks,
       notes,
     });
 
@@ -93,9 +99,11 @@ const updateProduct = async (req, res) => {
       featureImage,
       productGallery,
       productCode,
+      brand,
       unit,
       sellingPrice,
       barcodeNumber,
+      stocks,
       notes,
     } = req.body;
 
@@ -105,9 +113,11 @@ const updateProduct = async (req, res) => {
       featureImage: featureImage ? featureImage : product.featureImage,
       productGallery: productGallery ? productGallery : product.productGallery,
       productCode: productCode ? productCode : product.productCode,
+      brand: brand ? brand : product.brand,
       unit: unit ? unit : product.unit,
       sellingPrice: sellingPrice ? sellingPrice : product.sellingPrice,
       barcodeNumber: barcodeNumber ? barcodeNumber : product.barcodeNumber,
+      stocks: stocks ? stocks : product.stocks,
       notes: notes ? notes : product.notes,
     };
 
