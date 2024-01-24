@@ -52,6 +52,8 @@ const uploadImage = (req, res) => {
     );
     brandImg_local_path = filePath;
 
+    console.log(brandImg_local_path);
+
     return res.status(200).json({ success: true });
   });
 };

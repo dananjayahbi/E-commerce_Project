@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, message, Upload } from "antd";
 
@@ -6,16 +6,15 @@ const App = () => {
   const [fileList, setFileList] = useState([]);
   const [uploading, setUploading] = useState(false);
 
-
   const handleUpload = () => {
     const formData = new FormData();
     fileList.forEach((file) => {
-      formData.append("brandLogo", file);
+      formData.append("productImages", file);
     });
 
     setUploading(true);
 
-    fetch("http://localhost:5000/brands/uploadImage", {
+    fetch("http://localhost:5000/products/uploadMultipleProductImages", {
       method: "POST",
       body: formData,
     })
@@ -40,7 +39,7 @@ const App = () => {
       setFileList(newFileList);
     },
     beforeUpload: (file) => {
-      setFileList([...fileList, file]);
+      setFileList((prevFileList) => [...prevFileList, file]); // Append a single file at once
       return false;
     },
     fileList,
@@ -48,8 +47,8 @@ const App = () => {
 
   return (
     <>
-      <Upload {...props}>
-        <Button icon={<UploadOutlined />}>Select File</Button>
+      <Upload {...props} multiple>
+        <Button icon={<UploadOutlined />}>Select Files</Button>
       </Upload>
       <Button
         type="primary"
