@@ -7,7 +7,9 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
+  const [gallery, setGallery] = useState([]);
   const [productImagePreview, setProductImagePreview] = useState(null);
+  const [galleryPreview, setGalleryPreview] = useState([]);
 
   useEffect(() => {
     const fetchProductById = async () => {
@@ -29,9 +31,10 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
         );
 
         const productData = response.data;
-        setProductImagePreview(productData.imageURL);
+        setProductImagePreview(productData.featureImage);
+        setGalleryPreview(productData.productGallery);
 
-        // Set form values with the fetched unit data
+        // Set form values with the fetched product data
         form.setFieldsValue({
           productName: productData.productName,
           category: productData.category,
@@ -63,25 +66,58 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
         return;
       }
 
-      const formData = new FormData();
+      const formDataFI = new FormData();
       fileList.forEach((file) => {
-        formData.append("brandLogo", file);
+        formDataFI.append("productFimage", file);
       });
 
-      try {
-        await fetch("http://localhost:5000/brands/uploadImage", {
-          method: "POST",
-          body: formData,
-        });
+      const formDataGI = new FormData();
+      gallery.forEach((file) => {
+        formDataGI.append("gallery", file);
+      });
 
-        setFileList([]);
-      } catch (error) {
-        message.error("Upload failed.");
-        message.error("Failed to update Brand image!");
+      if (formDataFI) {
+        try {
+          await fetch(
+            "http://localhost:5000/products/uploadFeaturedProductImage",
+            {
+              method: "POST",
+              body: formDataFI,
+            }
+          )
+            .then((res) => res.json())
+            .then(() => {
+              setFileList([]);
+              console.log("Product Feature Image Upload successful.");
+            });
+        } catch (error) {
+          message.error("Uploading Product Feature failed.");
+          return;
+        }
+      }
+
+      if (formDataGI) {
+        try {
+          await fetch(
+            "http://localhost:5000/products/uploadMultipleProductImages",
+            {
+              method: "POST",
+              body: formDataGI,
+            }
+          )
+            .then((res) => res.json())
+            .then(() => {
+              setGallery([]);
+              console.log("Product Gallery Upload successful.");
+            });
+        } catch (error) {
+          message.error("Uploading Product Gallery failed.");
+          return;
+        }
       }
 
       const response = await axios.put(
-        `http://localhost:5000/brands/updateBrand/${productId}`,
+        `http://localhost:5000/products/updateProduct/${productId}`,
         values,
         {
           headers: {
@@ -99,14 +135,15 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
         console.error("Unexpected server response:", response);
       }
     } catch (error) {
-      console.error("Error updating unit:", error.response.data);
+      console.error("Error updating product:", error.response.data);
     } finally {
       form.resetFields();
       setLoading(false);
     }
   };
 
-  const props = {
+  const FIprops = {
+    //props for the feature image
     onRemove: (file) => {
       const index = fileList.indexOf(file);
       const newFileList = fileList.slice();
@@ -118,6 +155,21 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
       return false;
     },
     fileList,
+  };
+
+  const GIprops = {
+    //props for the gallery images
+    onRemove: (file) => {
+      const index = gallery.indexOf(file);
+      const newGallery = gallery.slice();
+      newGallery.splice(index, 1);
+      setGallery(newGallery);
+    },
+    beforeUpload: (file) => {
+      setGallery((prevGallery) => [...prevGallery, file]); // Append a single file at once
+      return false;
+    },
+    gallery,
   };
 
   return (
@@ -157,11 +209,7 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
           <Input />
         </Form.Item>
 
-        <Form.Item
-          label="Brand Logo"
-          name="imageURL"
-          rules={[{ required: true, message: "Please upload the brand logo!" }]}
-        >
+        <Form.Item label="Product Feature Image" name="imageURL">
           <div style={{ display: "flex", alignItems: "center" }}>
             {/* Display the brand logo */}
             {productImagePreview && (
@@ -174,8 +222,34 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
               </div>
             )}
 
-            <Upload {...props}>
+            <Upload {...FIprops}>
               <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
+          </div>
+        </Form.Item>
+
+        <Form.Item name="productGallery" label="Product Gallery">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            {/* Display gallery images */}
+            <div style={{ display: "flex" }}>
+              {galleryPreview?.map((imageUrl, index) => (
+                <div key={index} style={{ marginRight: "10px" }}>
+                  <img
+                    src={imageUrl}
+                    alt={`Preview of gallery image ${index}`}
+                    style={{ width: "50px", marginTop: "10px" }}
+                  />
+                </div>
+              ))}
+            </div>
+            <Upload {...GIprops} multiple>
+              <Button icon={<UploadOutlined />}>Select Images</Button>
             </Upload>
           </div>
         </Form.Item>

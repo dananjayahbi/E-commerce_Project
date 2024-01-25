@@ -18,7 +18,9 @@ let productGalleryImagesUrls = [];
 
 //Function to generate product code
 const generateProductCode = async () => {
-  const randomNumber = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+  const randomNumber = Math.floor(Math.random() * 10000000000)
+    .toString()
+    .padStart(10, "0");
   const productCode = "P" + randomNumber;
   return productCode;
 };
@@ -79,10 +81,7 @@ const multiStorage = multer.diskStorage({
 });
 
 // Set up multer with the defined storage for multiple files
-const uploadMultiple = multer({ storage: multiStorage }).array(
-  "gallery",
-  10
-);
+const uploadMultiple = multer({ storage: multiStorage }).array("gallery", 10);
 
 const uploadMultipleProductImages = (req, res) => {
   uploadMultiple(req, res, async (err) => {
@@ -198,7 +197,7 @@ const addProduct = async (req, res) => {
       category,
       featureImage: productF_image_url,
       productGallery: productGalleryImagesUrls,
-      productCode:productCode,
+      productCode: productCode,
       brand,
       unit,
       sellingPrice,
@@ -245,16 +244,13 @@ const getProductById = async (req, res) => {
   }
 };
 
-//Update product
+//Update the product
 const updateProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     const {
       productName,
       category,
-      featureImage,
-      productGallery,
-      productCode,
       brand,
       unit,
       sellingPrice,
@@ -263,12 +259,124 @@ const updateProduct = async (req, res) => {
       notes,
     } = req.body;
 
-    let updateData = {
+    //handle produyct feature image upload
+    try {
+      if (productFImg_local_path != "") {
+        let oldProductFImageURL = product.featureImage; // default to existing image
+        let publicId = ""; // variable to store the public_id
+
+        // Upload update image to Cloudinary
+        if (productFImg_local_path) {
+          const cloudinaryResponse = await cloudinary.uploader.upload(
+            productFImg_local_path,
+            { folder: "Products" }
+          );
+          productF_image_url = cloudinaryResponse.url;
+          console.log(productF_image_url);
+
+          // Delete the local file after successful Cloudinary upload
+          fs.unlinkSync(productFImg_local_path);
+          productFImg_local_path = "";
+
+          //Extract the public id of the cloudinary image URL
+          const urlSegments = oldProductFImageURL.split("/");
+          const publicIdIndex = urlSegments.indexOf("Products");
+          const publicIdWithExtension = urlSegments
+            .slice(publicIdIndex)
+            .join("/");
+          publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+
+          // Delete the existing image from Cloudinary
+          const cloudinaryDeleteResponse = await cloudinary.uploader.destroy(
+            publicId
+          );
+          console.log(cloudinaryDeleteResponse);
+        }
+      }
+    } catch (error) {
+      res.status(500).json({
+        errorMessage:
+          "Something went wrong when uploading the product feature image!\n" +
+          error,
+        status: false,
+      });
+    }
+
+    //handle product gallery images upload
+    try {
+      if (productGalleryImagesLocalPaths.length > 0) {
+        let oldProductGalleryImagesUrls = product.productGallery;
+        let oldPublicIds = [];
+
+        // Extract public IDs from old Cloudinary image URLs
+        for (const oldImageUrl of oldProductGalleryImagesUrls) {
+          const urlSegments = oldImageUrl.split("/");
+          const publicIdIndex = urlSegments.indexOf("Products");
+          const publicIdWithExtension = urlSegments
+            .slice(publicIdIndex)
+            .join("/");
+          const publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+          oldPublicIds.push(publicId);
+        }
+
+        if (productGalleryImagesLocalPaths) {
+          for (const imagePath of productGalleryImagesLocalPaths) {
+            const imageName = path.basename(imagePath);
+
+            // Check if the image is a gallery image
+            if (imageName.startsWith("PI")) {
+              const cloudinaryResponse = await cloudinary.uploader.upload(
+                imagePath,
+                { folder: "Products" }
+              );
+              const imageUrl = cloudinaryResponse.url;
+
+              // Store the uploaded image URL
+              productGalleryImagesUrls.push(imageUrl);
+
+              console.log("Uploaded image:", imageUrl);
+            }
+          }
+
+          // Delete old images from Cloudinary
+          for (const publicId of oldPublicIds) {
+            const cloudinaryDeleteResponse = await cloudinary.uploader.destroy(
+              publicId
+            );
+            console.log(cloudinaryDeleteResponse);
+          }
+
+          console.log("Old public IDs:", oldPublicIds);
+
+          // Delete the local files after successful Cloudinary upload
+          if (productFImg_local_path != "") {
+            fs.unlinkSync(productFImg_local_path);
+          }
+
+          if (productGalleryImagesLocalPaths.length > 0) {
+            for (const imagePath of productGalleryImagesLocalPaths) {
+              fs.unlinkSync(imagePath);
+            }
+          }
+          productFImg_local_path = "";
+          productGalleryImagesLocalPaths = [];
+        }
+      }
+    } catch (error) {
+      res.status(500).json({
+        errorMessage:
+          "Something went wrong when uploading the product gallery images!\n" +
+          error,
+        status: false,
+      });
+    }
+
+    // Update product data
+    const updateData = {
       productName: productName ? productName : product.productName,
       category: category ? category : product.category,
-      featureImage: featureImage ? featureImage : product.featureImage,
-      productGallery: productGallery ? productGallery : product.productGallery,
-      productCode: productCode ? productCode : product.productCode,
+      featureImage: productF_image_url ? productF_image_url : product.featureImage,
+      productGallery: productGalleryImagesUrls.length > 0 ? productGalleryImagesUrls : product.productGallery,
       brand: brand ? brand : product.brand,
       unit: unit ? unit : product.unit,
       sellingPrice: sellingPrice ? sellingPrice : product.sellingPrice,
@@ -277,7 +385,11 @@ const updateProduct = async (req, res) => {
       notes: notes ? notes : product.notes,
     };
 
-    const update = await Product.findByIdAndUpdate(req.params.id, updateData);
+    const update = await Product.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
+
+    productGalleryImagesUrls = [];
 
     if (update) {
       res.status(200).json({
