@@ -83,14 +83,14 @@ const Products = () => {
     setSearchText("");
   };
 
-  const handleEdit = (unitId) => {
+  const handleEdit = (productId) => {
     setEditModalVisible(true);
-    setSelectedProductId(unitId);
+    setSelectedProductId(productId);
   };
 
-  const handleDelete = (unitId) => {
+  const handleDelete = (productId) => {
     setDeleteModalVisible(true);
-    setSelectedProductId(unitId);
+    setSelectedProductId(productId);
   };
 
   const handleAddNew = () => {
@@ -145,6 +145,22 @@ const Products = () => {
   }, []);
 
   const columns = [
+    {
+      title: "",
+      dataIndex: "featureImage",
+      key: "featureImage",
+      ellipsis: true,
+      width: 70, // Adjust the width as per your requirement
+      render: (featureImage) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <img
+            src={featureImage ? featureImage : error_img}
+            alt="Avatar"
+            style={{ width: "50px", height: "50px" }}
+          />
+        </div>
+      ),
+    },
     {
       title: "Product Name",
       dataIndex: "productName",
@@ -249,7 +265,7 @@ const Products = () => {
 
         {/* Edit Unit Modal */}
         <EditProductModal
-          unitId={selectedProductId}
+          productId={selectedProductId}
           visible={editModalVisible}
           onCancel={handleEditProductModalCancel}
           onUpdate={handleEditProductModalUpdate}
@@ -257,7 +273,7 @@ const Products = () => {
 
         {/* Delete Unit Modal */}
         <DeleteProductModal
-          unitId={selectedProductId}
+          productId={selectedProductId}
           visible={deleteModalVisible}
           onCancel={handleDeleteProductModalCancel}
           onDelete={handleDeleteProductModalDelete}

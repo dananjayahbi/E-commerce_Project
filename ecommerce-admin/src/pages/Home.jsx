@@ -9,12 +9,12 @@ const App = () => {
   const handleUpload = () => {
     const formData = new FormData();
     fileList.forEach((file) => {
-      formData.append("productImages", file);
+      formData.append("productFimage", file);
     });
 
     setUploading(true);
 
-    fetch("http://localhost:5000/products/uploadMultipleProductImages", {
+    fetch("http://localhost:5000/products/uploadFeaturedProductImage", {
       method: "POST",
       body: formData,
     })
@@ -39,12 +39,12 @@ const App = () => {
       setFileList(newFileList);
     },
     beforeUpload: (file) => {
-      setFileList((prevFileList) => [...prevFileList, file]); // Append a single file at once
+      setFileList([...fileList, file]);
       return false;
     },
     fileList,
   };
-
+  
   return (
     <>
       <Upload {...props} multiple>

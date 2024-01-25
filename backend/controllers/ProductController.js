@@ -16,6 +16,13 @@ let productFImg_local_path = "";
 let productGalleryImagesLocalPaths = [];
 let productGalleryImagesUrls = [];
 
+//Function to generate product code
+const generateProductCode = async () => {
+  const randomNumber = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+  const productCode = "P" + randomNumber;
+  return productCode;
+};
+
 // Upload image to the temp_image folder
 // Define storage for image upload
 const storage = multer.diskStorage({
@@ -30,7 +37,7 @@ const storage = multer.diskStorage({
 });
 
 // Set up multer with the defined storage
-const uploadSingle = multer({ storage: storage }).single("profileFimage");
+const uploadSingle = multer({ storage: storage }).single("productFimage");
 
 const uploadFeaturedProductImage = (req, res) => {
   uploadSingle(req, res, async (err) => {
@@ -73,7 +80,7 @@ const multiStorage = multer.diskStorage({
 
 // Set up multer with the defined storage for multiple files
 const uploadMultiple = multer({ storage: multiStorage }).array(
-  "productImages",
+  "gallery",
   10
 );
 
@@ -113,7 +120,6 @@ const addProduct = async (req, res) => {
     category,
     featureImage,
     productGallery,
-    productCode,
     brand,
     unit,
     sellingPrice,
@@ -127,7 +133,6 @@ const addProduct = async (req, res) => {
       category == "" ||
       featureImage == "" ||
       productGallery == [] ||
-      productCode == "" ||
       brand == "" ||
       unit == "" ||
       sellingPrice == "" ||
@@ -186,13 +191,14 @@ const addProduct = async (req, res) => {
     }
     productFImg_local_path = "";
     productGalleryImagesLocalPaths = [];
+    const productCode = await generateProductCode();
 
     const newProduct = new Product({
       productName,
       category,
       featureImage: productF_image_url,
       productGallery: productGalleryImagesUrls,
-      productCode,
+      productCode:productCode,
       brand,
       unit,
       sellingPrice,

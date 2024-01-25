@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Button, Upload, message } from "antd";
+import { Modal, Form, Input, Button, Upload, message, InputNumber } from "antd";
 import axios from "axios";
 import { UploadOutlined } from "@ant-design/icons";
 
@@ -7,7 +7,8 @@ const AddProductModal = ({ visible, onCancel, onAdd }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState([]);
-  
+    const [gallery, setGallery] = useState([]);
+    
     const onFinish = async (values) => {
       setLoading(true);
       try {
@@ -18,24 +19,48 @@ const AddProductModal = ({ visible, onCancel, onAdd }) => {
           return;
         }
   
-        const formData = new FormData();
+        const formDataFI = new FormData();
         fileList.forEach((file) => {
-          formData.append("brandLogo", file);
+          formDataFI.append("productFimage", file);
+        });
+
+        const formDataGI = new FormData();
+        gallery.forEach((file) => {
+          formDataGI.append("gallery", file);
         });
   
         try {
-          await fetch("http://localhost:5000/brands/uploadImage", {
+          await fetch("http://localhost:5000/products/uploadFeaturedProductImage", {
             method: "POST",
-            body: formData,
-          });
-  
-          setFileList([]);
+            body: formDataFI,
+          })
+            .then((res) => res.json())
+            .then(() => {
+              setFileList([]);
+              console.log("Product Feature Image Upload successful.");
+            })
         } catch (error) {
-          message.error("Upload failed.");
+          message.error("Uploading Product Feature failed.");
+          return;
+        }
+
+        try {
+          await fetch("http://localhost:5000/products/uploadMultipleProductImages", {
+            method: "POST",
+            body: formDataGI,
+          })
+            .then((res) => res.json())
+            .then(() => {
+              setGallery([]);
+              console.log("Product Gallery Upload successful.");
+            })
+        } catch (error) {
+          message.error("Uploading Product Gallery failed.");
+          return;
         }
   
         const response = await axios.post(
-          "http://localhost:5000/brands/addBrand",
+          "http://localhost:5000/products/addProduct",
           values,
           {
             headers: {
@@ -47,7 +72,7 @@ const AddProductModal = ({ visible, onCancel, onAdd }) => {
         console.log("Server response:", response.data);
   
         if (response.status === 200) {
-          console.log("Brand added successfully");
+          console.log("Product added successfully");
           onAdd();
           // Reset the form fields after successful submission
           form.resetFields();
@@ -55,7 +80,7 @@ const AddProductModal = ({ visible, onCancel, onAdd }) => {
           console.error("Unexpected server response:", response);
         }
       } catch (error) {
-        console.error("Error adding brand:", error.response.data);
+        console.error("Error adding product:", error.response.data);
       } finally {
         setLoading(false);
       }
@@ -67,7 +92,7 @@ const AddProductModal = ({ visible, onCancel, onAdd }) => {
       onCancel();
     };
   
-    const props = {
+    const FIprops = { //props for the feature image
       onRemove: (file) => {
         const index = fileList.indexOf(file);
         const newFileList = fileList.slice();
@@ -80,10 +105,25 @@ const AddProductModal = ({ visible, onCancel, onAdd }) => {
       },
       fileList,
     };
+
+    const GIprops = { //props for the gallery images
+      onRemove: (file) => {
+        const index = gallery.indexOf(file);
+        const newGallery = gallery.slice();
+        newGallery.splice(index, 1);
+        setGallery(newGallery);
+      },
+      beforeUpload: (file) => {
+        setGallery((prevGallery) => [...prevGallery, file]); // Append a single file at once
+        return false;
+      },
+      gallery,
+    };
+  
   
     return (
       <Modal
-        title="Add New Brand"
+        title="Add New Product"
         visible={visible}
         style={{ top: 20 }}
         onCancel={handleCancel}
@@ -94,40 +134,104 @@ const AddProductModal = ({ visible, onCancel, onAdd }) => {
           <Button
             key="submit"
             type="primary"
+            disabled={fileList.length === 0}
             loading={loading}
             onClick={form.submit}
           >
-            Add
+            {loading ? "Adding" : "Add"}
           </Button>,
         ]}
       >
         <Form form={form} onFinish={onFinish} layout="vertical">
           <Form.Item
-            name="brandName"
-            label="Brand Name"
-            rules={[{ required: true, message: "Please enter the brand name" }]}
+            name="productName"
+            label="Product Name"
+            rules={[{ required: true, message: "Please enter the product name" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="category"
+            label="Category"
+            rules={[{ required: true, message: "Please enter the category" }]}
           >
             <Input />
           </Form.Item>
   
           <Form.Item
-            name="description"
-            label="Description"
-            rules={[{ required: true, message: "Please enter the description" }]}
-          >
-            <Input.TextArea />
-          </Form.Item>
-  
-          <Form.Item
-            name="imageURL"
-            label="Brand Logo"
+            name="featureImage"
+            label="Feature Product Image"
             rules={[
-              { required: true, message: "Please upload the brand logo!" },
+              { required: true, message: "Please upload the feature product image!" },
             ]}
           >
-            <Upload {...props}>
-              <Button icon={<UploadOutlined />}>Select File</Button>
+            <Upload {...FIprops}>
+              <Button icon={<UploadOutlined />}>Select Image</Button>
             </Upload>
+          </Form.Item>
+
+          <Form.Item
+            name="productGallery"
+            label="Product Gallery"
+            rules={[
+              { required: true, message: "Please upload the product gallery!" },
+            ]}
+          >
+            <Upload {...GIprops} multiple>
+              <Button icon={<UploadOutlined />}>Select Images</Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item
+            name="brand"
+            label="Brand"
+            rules={[{ required: true, message: "Please enter the brand" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="unit"
+            label="Unit"
+            rules={[{ required: true, message: "Please enter the unit" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="sellingPrice"
+            label="Selling Price"
+            rules={[{ required: true, message: "Please enter the selling price" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="barcodeNumber"
+            label="Barcode Number"
+            rules={[{ required: true, message: "Please enter the barcode number" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="stocks"
+            label="Stocks"
+            rules={[
+              { required: true, message: "Please enter the stocks" },
+              { type: "integer", message: "Stocks must be an integer" },
+            ]}
+          >
+            <InputNumber step={1} precision={0} />
+          </Form.Item>
+
+          <Form.Item
+            name="notes"
+            label="Notes"
+            rules={[{ required: true, message: "Please enter the notes" }]}
+          >
+            <Input.TextArea />
           </Form.Item>
         </Form>
       </Modal>
