@@ -3,24 +3,24 @@ import { UploadOutlined } from "@ant-design/icons";
 import { Button, message, Upload } from "antd";
 
 const App = () => {
-  const [fileList, setFileList] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [gallery, setGallery] = useState([]);
 
   const handleUpload = () => {
-    const formData = new FormData();
-    fileList.forEach((file) => {
-      formData.append("productFimage", file);
+    const formDataGI = new FormData();
+    gallery.forEach((file) => {
+      formDataGI.append("gallery", file);
     });
 
     setUploading(true);
 
-    fetch("http://localhost:5000/products/uploadFeaturedProductImage", {
+    fetch("http://localhost:5000/products/uploadMultipleProductImages", {
       method: "POST",
-      body: formData,
+      body: formDataGI,
     })
       .then((res) => res.json())
       .then(() => {
-        setFileList([]);
+        setGallery([]);
         message.success("Upload successful.");
       })
       .catch(() => {
@@ -33,27 +33,27 @@ const App = () => {
 
   const props = {
     onRemove: (file) => {
-      const index = fileList.indexOf(file);
-      const newFileList = fileList.slice();
-      newFileList.splice(index, 1);
-      setFileList(newFileList);
+      const index = gallery.indexOf(file);
+      const newGallery = gallery.slice();
+      newGallery.splice(index, 1);
+      setGallery(newGallery);
     },
     beforeUpload: (file) => {
-      setFileList([...fileList, file]);
+      setGallery((prevGallery) => [...prevGallery, file]); // Append a single file at once
       return false;
     },
-    fileList,
+    gallery,
+    multiple: true
   };
   
   return (
     <>
-      <Upload {...props} multiple>
+      <Upload {...props}>
         <Button icon={<UploadOutlined />}>Select Files</Button>
       </Upload>
       <Button
         type="primary"
         onClick={handleUpload}
-        disabled={fileList.length === 0}
         loading={uploading}
         style={{
           marginTop: 16,

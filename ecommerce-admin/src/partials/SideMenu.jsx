@@ -11,7 +11,6 @@ import {
   Gauge,
   Layers3,
   LineChart,
-  PackagePlus,
   PackageSearch,
   PercentDiamond,
   PlusCircle,
@@ -58,9 +57,6 @@ const SideMenu = () => {
         break;
       case "1":
         navigate("/products");
-        break;
-      case "2":
-        navigate("/addProduct");
         break;
       case "3":
         navigate("/category");
@@ -157,9 +153,6 @@ const SideMenu = () => {
         >
           <Menu.Item key="1" icon={<GanttChartSquare size={15} />}>
             Products
-          </Menu.Item>
-          <Menu.Item key="2" icon={<PackagePlus size={15} />}>
-            Add Product
           </Menu.Item>
           <Menu.Item key="3" icon={<Layers3 size={15} />}>
             Category

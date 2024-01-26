@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, Upload, message, InputNumber } from "antd";
+import { Modal, Form, Input, Button, Upload, message, InputNumber, Select } from "antd";
 import axios from "axios";
 import { UploadOutlined } from "@ant-design/icons";
 
@@ -10,6 +10,23 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
   const [gallery, setGallery] = useState([]);
   const [productImagePreview, setProductImagePreview] = useState(null);
   const [galleryPreview, setGalleryPreview] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    // Fetch categories from the server
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/categories/getCategories"
+        );
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching cartegories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const fetchProductById = async () => {
@@ -204,9 +221,15 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
         <Form.Item
           name="category"
           label="Category"
-          rules={[{ required: true, message: "Please enter the category" }]}
+          rules={[{ required: true, message: "Please select the category" }]}
         >
-          <Input />
+          <Select placeholder="Select a category">
+            {categories.map((category) => (
+              <Option key={category._id} value={category.categoryName}>
+                {category.categoryName}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item label="Product Feature Image" name="imageURL">

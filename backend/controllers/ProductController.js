@@ -74,8 +74,9 @@ const multiStorage = multer.diskStorage({
     cb(null, path.join(__dirname, "../images/temp_images"));
   },
   filename: (req, file, cb) => {
+    const randomNumber = Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
     const ext = path.extname(file.originalname);
-    const fileName = "PI" + Date.now() + ext;
+    const fileName = "PI" + randomNumber + ext;
     cb(null, fileName);
   },
 });
@@ -117,8 +118,6 @@ const addProduct = async (req, res) => {
   const {
     productName,
     category,
-    featureImage,
-    productGallery,
     brand,
     unit,
     sellingPrice,
@@ -130,8 +129,6 @@ const addProduct = async (req, res) => {
     if (
       productName == "" ||
       category == "" ||
-      featureImage == "" ||
-      productGallery == [] ||
       brand == "" ||
       unit == "" ||
       sellingPrice == "" ||
@@ -184,9 +181,18 @@ const addProduct = async (req, res) => {
     await uploadProductGalleryImages();
 
     // Delete the local files after successful Cloudinary upload
-    fs.unlinkSync(productFImg_local_path);
-    for (const imagePath of productGalleryImagesLocalPaths) {
-      fs.unlinkSync(imagePath);
+    if (productFImg_local_path != "") {
+      fs.unlinkSync(productFImg_local_path);
+    }
+
+    if (productGalleryImagesLocalPaths.length > 0) {
+      for (const imagePath of productGalleryImagesLocalPaths) {
+        if (imagePath && fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        } else {
+          continue;
+        }
+      }
     }
     productFImg_local_path = "";
     productGalleryImagesLocalPaths = [];
@@ -207,6 +213,8 @@ const addProduct = async (req, res) => {
     });
 
     await newProduct.save();
+    productF_image_url = "";
+    productGalleryImagesUrls = [];
     res.json({ message: "Product added successfully" });
   } catch (error) {
     res.status(500);
@@ -294,7 +302,7 @@ const updateProduct = async (req, res) => {
         }
       }
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         errorMessage:
           "Something went wrong when uploading the product feature image!\n" +
           error,
@@ -355,15 +363,21 @@ const updateProduct = async (req, res) => {
 
           if (productGalleryImagesLocalPaths.length > 0) {
             for (const imagePath of productGalleryImagesLocalPaths) {
-              fs.unlinkSync(imagePath);
+              if (imagePath && fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+              } else {
+                continue;
+              }
             }
           }
-          productFImg_local_path = "";
-          productGalleryImagesLocalPaths = [];
         }
+        productFImg_local_path = "";
+        productF_image_url = "";
+        productGalleryImagesLocalPaths = [];
+        productGalleryImagesUrls = [];
       }
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         errorMessage:
           "Something went wrong when uploading the product gallery images!\n" +
           error,
@@ -375,8 +389,13 @@ const updateProduct = async (req, res) => {
     const updateData = {
       productName: productName ? productName : product.productName,
       category: category ? category : product.category,
-      featureImage: productF_image_url ? productF_image_url : product.featureImage,
-      productGallery: productGalleryImagesUrls.length > 0 ? productGalleryImagesUrls : product.productGallery,
+      featureImage: productF_image_url
+        ? productF_image_url
+        : product.featureImage,
+      productGallery:
+        productGalleryImagesUrls.length > 0
+          ? productGalleryImagesUrls
+          : product.productGallery,
       brand: brand ? brand : product.brand,
       unit: unit ? unit : product.unit,
       sellingPrice: sellingPrice ? sellingPrice : product.sellingPrice,
@@ -431,6 +450,63 @@ const deleteProduct = async (req, res) => {
       } else {
         res.status(400).json({
           data: "Product Delete Failed!",
+          status: false,
+        });
+      }
+
+      // Delete product feature image from Cloudinary
+      try {
+        let oldProductFImageURL = product.featureImage;
+        let publicId = ""; // variable to store the public_id
+
+        //Extract the public id of the cloudinary image URL
+        const urlSegments = oldProductFImageURL.split("/");
+        const publicIdIndex = urlSegments.indexOf("Products");
+        const publicIdWithExtension = urlSegments
+          .slice(publicIdIndex)
+          .join("/");
+        publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+
+        // Delete the existing image from Cloudinary
+        const cloudinaryDeleteResponse = await cloudinary.uploader.destroy(
+          publicId
+        );
+        console.log(cloudinaryDeleteResponse);
+      } catch (error) {
+        return res.status(500).json({
+          errorMessage:
+            "Something went wrong when deleing the feature image!\n" + error,
+          status: false,
+        });
+      }
+
+      // Delete product gallery images from Cloudinary
+      try {
+        let oldProductGalleryImagesUrls = product.productGallery;
+        let oldPublicIds = [];
+
+        // Extract public IDs from old Cloudinary image URLs
+        for (const oldImageUrl of oldProductGalleryImagesUrls) {
+          const urlSegments = oldImageUrl.split("/");
+          const publicIdIndex = urlSegments.indexOf("Products");
+          const publicIdWithExtension = urlSegments
+            .slice(publicIdIndex)
+            .join("/");
+          const publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+          oldPublicIds.push(publicId);
+        }
+
+        // Delete old images from Cloudinary
+        for (const publicId of oldPublicIds) {
+          const cloudinaryDeleteResponse = await cloudinary.uploader.destroy(
+            publicId
+          );
+          console.log(cloudinaryDeleteResponse);
+        }
+      } catch (error) {
+        return res.status(500).json({
+          errorMessage:
+            "Something went wrong when deleting the gallery images!\n" + error,
           status: false,
         });
       }
