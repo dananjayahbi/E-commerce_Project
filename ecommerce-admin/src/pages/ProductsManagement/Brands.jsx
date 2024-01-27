@@ -151,10 +151,10 @@ const Brands = () => {
       key: "imageURL",
       ellipsis: true,
       width: 70, // Adjust the width as per your requirement
-      render: (profileImage) => (
+      render: (brandImage) => (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
-            src={profileImage ? profileImage : error_img}
+            src={brandImage ? brandImage : error_img}
             alt="Avatar"
             style={{ width: "50px", height: "50px" }}
           />

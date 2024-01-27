@@ -2,6 +2,8 @@ const router = require("express").Router();
 const { protect } = require("../middleware/authorization");
 
 const {
+  uploadFeaturedProductImage,
+  uploadMultipleProductImages,
   addProduct,
   getProducts,
   getProductById,
@@ -23,5 +25,11 @@ router.put("/updateProduct/:id", protect, updateProduct);
 
 //DELETE PRODUCT
 router.delete("/deleteProduct/:id", protect, deleteProduct);
+
+//UPLOAD FEATURED PRODUCT IMAGE
+router.post("/uploadFeaturedProductImage", uploadFeaturedProductImage);
+
+//UPLOAD MULTIPLE PRODUCT IMAGES
+router.post("/uploadMultipleProductImages", uploadMultipleProductImages);
 
 module.exports = router;

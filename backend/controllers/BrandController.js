@@ -52,6 +52,8 @@ const uploadImage = (req, res) => {
     );
     brandImg_local_path = filePath;
 
+    console.log(brandImg_local_path);
+
     return res.status(200).json({ success: true });
   });
 };
@@ -131,7 +133,7 @@ const updateBrand = async (req, res) => {
     const brand = await Brand.findById(req.params.id);
     const { brandName, description } = req.body;
 
-    let newBrandImageUrl = brand.imageURL; // default to existing image
+    let oldBrandImageUrl = brand.imageURL; // default to existing image
     let publicId = ""; // variable to store the public_id
 
     // Upload update image to Cloudinary
@@ -148,7 +150,7 @@ const updateBrand = async (req, res) => {
       brandImg_local_path = "";
 
       //Extract the public id of the cloudinary image URL
-      const urlSegments = newBrandImageUrl.split("/");
+      const urlSegments = oldBrandImageUrl.split("/");
       const publicIdIndex = urlSegments.indexOf("Brands");
       const publicIdWithExtension = urlSegments.slice(publicIdIndex).join("/");
       publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
@@ -158,7 +160,6 @@ const updateBrand = async (req, res) => {
         publicId
       );
       console.log(cloudinaryDeleteResponse);
-      console.log(brand_image_url);
     }
 
     let updateData = {
@@ -211,7 +212,24 @@ const deleteBrand = async (req, res) => {
           data: "Brand Delete Failed!",
           status: false,
         });
+        return;
       }
+
+      let oldBrandImageUrl = brand.imageURL;
+      let publicId = "";
+
+      //Extract the public id of the cloudinary image URL
+      const urlSegments = oldBrandImageUrl.split("/");
+      const publicIdIndex = urlSegments.indexOf("Brands");
+      const publicIdWithExtension = urlSegments.slice(publicIdIndex).join("/");
+      publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+
+      // Delete the existing image from Cloudinary
+      const cloudinaryDeleteResponse = await cloudinary.uploader.destroy(
+        publicId
+      );
+      console.log(cloudinaryDeleteResponse);
+      
     }
   } catch (error) {
     res.status(500).json({

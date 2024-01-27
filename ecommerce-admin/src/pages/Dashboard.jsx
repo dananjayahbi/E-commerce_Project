@@ -6,7 +6,6 @@ import Header from "../partials/Header";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home";
 import Products from "../pages/ProductsManagement/Products";
-import AddProduct from "../pages/ProductsManagement/AddProduct";
 import Category from "../pages/ProductsManagement/Category";
 import Units from "../pages/ProductsManagement/Units";
 import Brands from "../pages/ProductsManagement/Brands";
@@ -87,7 +86,6 @@ const Dashboard = () => {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/products" element={<Products />} />
-                <Route path="/addProduct" element={<AddProduct />} />
                 <Route path="/category" element={<Category />} />
                 <Route path="/units" element={<Units />} />
                 <Route path="/brands" element={<Brands />} />
