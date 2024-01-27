@@ -11,6 +11,8 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
   const [productImagePreview, setProductImagePreview] = useState(null);
   const [galleryPreview, setGalleryPreview] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [units, setUnits] = useState([]);
 
   useEffect(() => {
     // Fetch categories from the server
@@ -25,7 +27,33 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
       }
     };
 
+    // Fetch brands from the server
+    const fetchBrands = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/brands/getBrands"
+        );
+        setBrands(response.data);
+      } catch (error) {
+        console.error("Error fetching brands:", error);
+      }
+    };
+
+    // Fetch units from the server
+    const fetchUnits = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/units/getUnits"
+        );
+        setUnits(response.data);
+      } catch (error) {
+        console.error("Error fetching units:", error);
+      }
+    };
+
     fetchCategories();
+    fetchBrands();
+    fetchUnits();
   }, []);
 
   useEffect(() => {
@@ -280,17 +308,29 @@ const EditProductModal = ({ productId, visible, onCancel, onUpdate }) => {
         <Form.Item
           name="brand"
           label="Brand"
-          rules={[{ required: true, message: "Please enter the brand" }]}
+          rules={[{ required: true, message: "Please select the brand" }]}
         >
-          <Input />
+          <Select placeholder="Select a brand">
+            {brands.map((brand) => (
+              <Option key={brand._id} value={brand.brandName}>
+                {brand.brandName}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
           name="unit"
           label="Unit"
-          rules={[{ required: true, message: "Please enter the unit" }]}
+          rules={[{ required: true, message: "Please select the unit" }]}
         >
-          <Input />
+          <Select placeholder="Select a unit">
+            {units.map((unit) => (
+              <Option key={unit._id} value={unit.unitName}>
+                {unit.unitName}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
