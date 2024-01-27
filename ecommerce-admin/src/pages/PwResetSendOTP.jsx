@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
+import { message } from "antd";
 import * as Yup from "yup";
 import {
   Button,
@@ -9,45 +10,39 @@ import {
   TextField,
   Paper,
 } from "@mui/material";
-import { LockOutlined as LockOutlinedIcon } from "@mui/icons-material";
+import { MailOutline as MailOutlineIcon } from "@mui/icons-material";
 import axios from "axios";
 
 const CustomTextField = ({ field, form, ...props }) => (
   <TextField {...field} {...props} />
 );
 
-const Login = () => {
-  const [error, setError] = useState("");
-
-  const initialValues = { emailOrUsername: "", password: "" };
+const PwResetSendOTP = () => {
+  const initialValues = { email: "" };
+  const [loading, setLoading] = useState(false);
 
   const validationSchema = Yup.object({
-    emailOrUsername: Yup.string().required("Username is required"),
-    password: Yup.string().required("Password is required"),
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
+    setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:5000/users/login",
-        values
-      );
-
-      console.log("Login successful");
-
-      // Store only the token in local storage
-      window.localStorage.setItem("token", response.data.token);
-
-      // Set LoggedIn to true
-      window.localStorage.setItem("LoggedIn", true);
-
-      console.log(localStorage.getItem("token"));
-      window.location.href = "/";
+      await axios.post("http://localhost:5000/users/handleOTP", {
+        email: values.email, // Pass email in the request body
+      });
+      console.log("Email sent successfully to backend for OTP handling.");
+      // Redirect to verifyOTP page
+      message.success("Check your email for the OTP.");
+      window.location.href = "/verifyOTP"; // Change the URL to the appropriate route
     } catch (error) {
-      console.error("Login failed", error);
-      setError("Invalid username or password");
+      console.error("Failed to send email to backend for OTP handling:", error);
+      message.error("Failed to send the otp.");
     } finally {
       setSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -73,9 +68,9 @@ const Login = () => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
         }}
       >
-        <LockOutlinedIcon />
+        <MailOutlineIcon />
         <Typography component="h1" variant="h5">
-          Sign in
+          Reset Password
         </Typography>
         <Formik
           initialValues={initialValues}
@@ -89,42 +84,22 @@ const Login = () => {
                 variant="outlined"
                 margin="normal"
                 fullWidth
-                id="emailOrUsername"
-                label="Username"
-                name="emailOrUsername"
-                autoComplete="emailOrUsername"
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
               />
-              <Field
-                component={CustomTextField}
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-              />
-              {error && <Typography color="error">{error}</Typography>}
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
+                loading={loading}
                 disabled={isSubmitting}
                 style={{ margin: "16px 0" }}
               >
-                Sign In
+                Submit
               </Button>
-
-              {/* forgot password */}
-              <Typography
-                variant="body2"
-                align="center"
-                style={{ textDecoration: "none" }}
-              >
-                <a href="/sendOTP" style={{ textDecoration: "none" }}>Forgot password?</a>
-              </Typography>
             </Form>
           )}
         </Formik>
@@ -133,4 +108,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default PwResetSendOTP;

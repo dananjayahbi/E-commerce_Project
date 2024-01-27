@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
+import { message } from "antd";
 import * as Yup from "yup";
 import {
   Button,
@@ -9,45 +10,52 @@ import {
   TextField,
   Paper,
 } from "@mui/material";
-import { LockOutlined as LockOutlinedIcon } from "@mui/icons-material";
 import axios from "axios";
 
 const CustomTextField = ({ field, form, ...props }) => (
   <TextField {...field} {...props} />
 );
 
-const Login = () => {
-  const [error, setError] = useState("");
+const PwResetVerifyOTP = () => {
+  const [verificationError, setVerificationError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const initialValues = { emailOrUsername: "", password: "" };
+  const initialValues = {
+    otp: "",
+  };
 
-  const validationSchema = Yup.object({
-    emailOrUsername: Yup.string().required("Username is required"),
-    password: Yup.string().required("Password is required"),
+  const validationSchema = Yup.object().shape({
+    otp: Yup.string()
+      .matches(/^\d{6}$/, "OTP must be exactly 6 digits")
+      .required("OTP is required"),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
+    setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/users/login",
-        values
+        "http://localhost:5000/users/verifyOTP",
+        { otp: values.otp }
       );
 
-      console.log("Login successful");
+      if (response.data.status === true) {
+        console.log("OTP verification successful");
+        message.success("OTP verified successfully.");
+        localStorage.setItem("userId", (response.data.user._id))
 
-      // Store only the token in local storage
-      window.localStorage.setItem("token", response.data.token);
-
-      // Set LoggedIn to true
-      window.localStorage.setItem("LoggedIn", true);
-
-      console.log(localStorage.getItem("token"));
-      window.location.href = "/";
+        // Redirect to password reset page if OTP verification is successful
+        window.location.href = "./PwReset";
+      } else {
+        setVerificationError("Incorrect OTP. Please try again.");
+        message.error("Incorrect OTP. Please try again.");
+      }
     } catch (error) {
-      console.error("Login failed", error);
-      setError("Invalid username or password");
+      console.error("OTP verification failed:", error);
+      setVerificationError("Error verifying OTP. Please try again.");
+      message.error("Error verifying OTP. Please try again.");
     } finally {
       setSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -73,9 +81,8 @@ const Login = () => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
         }}
       >
-        <LockOutlinedIcon />
         <Typography component="h1" variant="h5">
-          Sign in
+          OTP Verification
         </Typography>
         <Formik
           initialValues={initialValues}
@@ -89,42 +96,30 @@ const Login = () => {
                 variant="outlined"
                 margin="normal"
                 fullWidth
-                id="emailOrUsername"
-                label="Username"
-                name="emailOrUsername"
-                autoComplete="emailOrUsername"
+                id="otp"
+                name="otp"
+                label="Enter OTP"
+                type="text"
+                inputProps={{
+                  maxLength: 6,
+                  pattern: "[0-9]*",
+                  inputMode: "numeric",
+                }}
               />
-              <Field
-                component={CustomTextField}
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-              />
-              {error && <Typography color="error">{error}</Typography>}
+              {verificationError && (
+                <Typography color="error">{verificationError}</Typography>
+              )}
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
+                loading={loading}
                 disabled={isSubmitting}
                 style={{ margin: "16px 0" }}
               >
-                Sign In
+                Verify OTP
               </Button>
-
-              {/* forgot password */}
-              <Typography
-                variant="body2"
-                align="center"
-                style={{ textDecoration: "none" }}
-              >
-                <a href="/sendOTP" style={{ textDecoration: "none" }}>Forgot password?</a>
-              </Typography>
             </Form>
           )}
         </Formik>
@@ -133,4 +128,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default PwResetVerifyOTP;

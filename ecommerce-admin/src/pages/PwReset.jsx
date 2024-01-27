@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
+import { message } from "antd";
 import * as Yup from "yup";
 import {
   Button,
@@ -9,45 +10,53 @@ import {
   TextField,
   Paper,
 } from "@mui/material";
-import { LockOutlined as LockOutlinedIcon } from "@mui/icons-material";
 import axios from "axios";
 
 const CustomTextField = ({ field, form, ...props }) => (
   <TextField {...field} {...props} />
 );
 
-const Login = () => {
-  const [error, setError] = useState("");
+const PwReset = () => {
+  const [resetError, setResetError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const initialValues = { emailOrUsername: "", password: "" };
+  const initialValues = {
+    newPassword: "",
+    confirmPassword: "",
+  };
 
-  const validationSchema = Yup.object({
-    emailOrUsername: Yup.string().required("Username is required"),
-    password: Yup.string().required("Password is required"),
+  const validationSchema = Yup.object().shape({
+    newPassword: Yup.string()
+      .required("New Password is required")
+      .min(8, "Password must be at least 8 characters"),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
+      .required("Confirm Password is required"),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
+    setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:5000/users/login",
-        values
+      const userId = localStorage.getItem("userId");
+      await axios.put(
+        "http://localhost:5000/users/resetPassword",
+        {
+          userId,
+          newPassword: values.newPassword,
+        }
       );
 
-      console.log("Login successful");
-
-      // Store only the token in local storage
-      window.localStorage.setItem("token", response.data.token);
-
-      // Set LoggedIn to true
-      window.localStorage.setItem("LoggedIn", true);
-
-      console.log(localStorage.getItem("token"));
-      window.location.href = "/";
+      console.log("Password reset successful");
+      message.success("Password reset successful.");
+      // Redirect to login page after password reset
+      window.location.href = "./Login";
     } catch (error) {
-      console.error("Login failed", error);
-      setError("Invalid username or password");
+      console.error("Password reset failed:", error);
+      setResetError("Failed to reset password. Please try again.");
+      message.error("Failed to reset password. Please try again.");
     } finally {
       setSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -73,9 +82,8 @@ const Login = () => {
           boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
         }}
       >
-        <LockOutlinedIcon />
         <Typography component="h1" variant="h5">
-          Sign in
+          Reset Password
         </Typography>
         <Formik
           initialValues={initialValues}
@@ -89,42 +97,35 @@ const Login = () => {
                 variant="outlined"
                 margin="normal"
                 fullWidth
-                id="emailOrUsername"
-                label="Username"
-                name="emailOrUsername"
-                autoComplete="emailOrUsername"
+                id="newPassword"
+                label="New Password"
+                name="newPassword"
+                type="password"
               />
               <Field
                 component={CustomTextField}
                 variant="outlined"
                 margin="normal"
                 fullWidth
-                name="password"
-                label="Password"
+                id="confirmPassword"
+                label="Confirm Password"
+                name="confirmPassword"
                 type="password"
-                id="password"
-                autoComplete="current-password"
               />
-              {error && <Typography color="error">{error}</Typography>}
+              {resetError && (
+                <Typography color="error">{resetError}</Typography>
+              )}
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
+                loading={loading}
                 disabled={isSubmitting}
                 style={{ margin: "16px 0" }}
               >
-                Sign In
+                Reset Password
               </Button>
-
-              {/* forgot password */}
-              <Typography
-                variant="body2"
-                align="center"
-                style={{ textDecoration: "none" }}
-              >
-                <a href="/sendOTP" style={{ textDecoration: "none" }}>Forgot password?</a>
-              </Typography>
             </Form>
           )}
         </Formik>
@@ -133,4 +134,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default PwReset;
