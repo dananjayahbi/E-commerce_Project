@@ -38,10 +38,14 @@ const Login = () => {
       // Store only the token in local storage
       window.localStorage.setItem("token", response.data.token);
 
+      // Store the user id in local storage
+      window.localStorage.setItem("userId", response.data.user.id);
+
       // Set LoggedIn to true
       window.localStorage.setItem("LoggedIn", true);
 
       console.log(localStorage.getItem("token"));
+      console.log(localStorage.getItem("userId"));
       window.location.href = "/";
     } catch (error) {
       console.error("Login failed", error);
