@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { Menu, Layout } from "antd";
 import { useNavigate } from "react-router-dom";
-import { fetchDashboardLogo } from '../utils/globalExports';
+import { fetchDashboardLogo } from "../utils/globalExports";
 import errorImage from "../images/error_img.png";
 
 const { Header, Sider } = Layout;
@@ -36,6 +36,8 @@ const SideMenu = () => {
   const [current, setCurrent] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const [dashboardLogo, setDashboardLogo] = useState(null);
+  const [role, setRole] = useState(null);
+  const [rolePermissions, setRolePermissions] = useState(null);
 
   useEffect(() => {
     const getDashboardLogo = async () => {
@@ -43,8 +45,32 @@ const SideMenu = () => {
       setDashboardLogo(imageUrl);
     };
 
+    setRole(localStorage.getItem("role"));
+    setRolePermissions(localStorage.getItem("rolePermissions"));
+
     getDashboardLogo();
-  }, []); // Empty dependency array ensures the effect runs only once after the initial render
+  }, []);
+
+  // Function to check if a specific permission is true or false
+  const checkPermission = (permission) => {
+    if (!rolePermissions) {
+      return false;
+    }
+
+    // Split the rolePermissions string into an array of permissions
+    const permissionsArray = rolePermissions.split(",");
+
+    // Loop through the permissionsArray
+    for (const perm of permissionsArray) {
+      // Split each permission into key and value
+      const [key, value] = perm.split(":");
+
+      if (key === permission && value.trim().toLowerCase() === "true") {
+        return true;
+      }
+    }
+    return false;
+  };
 
   const onClick = (e) => {
     console.log("click ", e);
@@ -56,60 +82,95 @@ const SideMenu = () => {
         navigate("/");
         break;
       case "1":
-        navigate("/products");
+        if (checkPermission("products") === true) {
+          navigate("/products");
+        }
         break;
       case "3":
-        navigate("/category");
+        if (checkPermission("categories") === true) {
+          navigate("/category");
+        }
         break;
       case "4":
-        navigate("/units");
+        if (checkPermission("units") === true) {
+          navigate("/units");
+        }
         break;
       case "5":
-        navigate("/brands");
+        if (checkPermission("brands") === true) {
+          navigate("/brands");
+        }
         break;
       case "6":
-        navigate("/orders");
+        if (checkPermission("orders") === true) {
+          navigate("/orders");
+        }
         break;
       case "7":
-        navigate("/sales");
+        if (checkPermission("sales") === true) {
+          navigate("/sales");
+        }
         break;
       case "8":
-        navigate("/newSale");
+        if (checkPermission("newSale") === true) {
+          navigate("/newSale");
+        }
         break;
       case "9":
-        navigate("/customers");
+        if (checkPermission("customers") === true) {
+          navigate("/customers");
+        }
         break;
       case "10":
-        navigate("/users");
+        if (checkPermission("users") === true) {
+          navigate("/users");
+        }
         break;
       case "11":
-        navigate("/roles");
+        if (checkPermission("roles") === true) {
+          navigate("/roles");
+        }
         break;
       case "12":
-        navigate("/salesReport");
+        if (checkPermission("salesReport") === true) {
+          navigate("/salesReport");
+        }
         break;
       case "13":
-        navigate("/inventoryReport");
+        if (checkPermission("inventoryReport") === true) {
+          navigate("/inventoryReport");
+        }
         break;
       case "14":
-        navigate("/productsReport");
+        if (checkPermission("productsReport") === true) {
+          navigate("/productsReport");
+        }
         break;
       case "15":
-        navigate("/productQuantityAlerts");
+        if (checkPermission("productQuantityAlerts") === true) {
+          navigate("/productQuantityAlerts");
+        }
         break;
       case "16":
-        navigate("/systemSettings");
+        if (checkPermission("systemSettings") === true) {
+          navigate("/systemSettings");
+        }
         break;
       case "17":
-        navigate("/storeSettings");
+        if (checkPermission("storeSettings") === true) {
+          navigate("/storeSettings");
+        }
         break;
       case "18":
-        navigate("/emailTemplates");
+        if (checkPermission("emailTemplates") === true) {
+          navigate("/emailTemplates");
+        }
         break;
       case "19":
-        navigate("/backup");
+        if (checkPermission("backup") === true) {
+          navigate("/backup");
+        }
         break;
-      // Add more cases as needed
       default:
         break;
     }
@@ -129,7 +190,13 @@ const SideMenu = () => {
         <Header
           style={{ color: "#fff", display: "flex", justifyContent: "center" }}
         >
-          <img src={dashboardLogo ? dashboardLogo : errorImage} alt="Logo" width="120px" height="120px" style={{ borderRadius: errorImage ? "20%" : "0" }} />
+          <img
+            src={dashboardLogo ? dashboardLogo : errorImage}
+            alt="Logo"
+            width="120px"
+            height="120px"
+            style={{ borderRadius: errorImage ? "20%" : "0" }}
+          />
         </Header>
       </Layout>
       <Menu
