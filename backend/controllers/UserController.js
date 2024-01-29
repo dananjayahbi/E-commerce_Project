@@ -192,6 +192,10 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email/username" });
     }
 
+    if (user.isActive === false) {
+      return res.status(400).json({ message: "User is not active" });
+    }
+
     // Check password
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
@@ -341,7 +345,7 @@ const updateUser = async (req, res) => {
         ? profile_image_url
         : userFetch.profileImage,
       NIC: NIC ? NIC : userFetch.NIC,
-      isActive: isActive ? isActive : userFetch.isActive,
+      isActive: isActive !== undefined ? isActive : userFetch.isActive,
       updatedAt: Date.now(),
     };
 
@@ -455,7 +459,11 @@ const verifyOTP = async (req, res) => {
         // Reset the OTP to blank after successful verification
         await user.save();
 
-        return res.json({ message: "OTP verified successfully", status: true, user: user});
+        return res.json({
+          message: "OTP verified successfully",
+          status: true,
+          user: user,
+        });
       } else {
         return res.status(400).json({ message: "Invalid OTP", status: false });
       }
@@ -517,9 +525,7 @@ const resetPassword = async (req, res) => {
           });
         }
       } else {
-        return res
-          .status(400)
-          .json({ message: "User not found!" });
+        return res.status(400).json({ message: "User not found!" });
       }
     } else {
       res.status(404).json({

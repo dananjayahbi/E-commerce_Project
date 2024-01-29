@@ -87,7 +87,7 @@ const SideMenu = () => {
         }
         break;
       case "3":
-        if (checkPermission("categories") === true) {
+        if (checkPermission("category") === true) {
           navigate("/category");
         }
         break;

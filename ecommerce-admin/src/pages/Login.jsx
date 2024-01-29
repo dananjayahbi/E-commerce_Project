@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
+import { message } from "antd";
 import * as Yup from "yup";
 import {
   Button,
@@ -72,6 +73,7 @@ const Login = () => {
       window.location.href = "/";
     } catch (error) {
       console.error("Login failed", error);
+      message.error(error.response.data.message);
       setError("Invalid username or password");
     } finally {
       setSubmitting(false);
