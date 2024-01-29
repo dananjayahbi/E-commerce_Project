@@ -372,9 +372,7 @@ const updateProduct = async (req, res) => {
           }
         }
         productFImg_local_path = "";
-        productF_image_url = "";
         productGalleryImagesLocalPaths = [];
-        productGalleryImagesUrls = [];
       }
     } catch (error) {
       return res.status(500).json({
@@ -384,6 +382,8 @@ const updateProduct = async (req, res) => {
         status: false,
       });
     }
+
+    console.log(productGalleryImagesUrls)
 
     // Update product data
     const updateData = {
@@ -408,6 +408,7 @@ const updateProduct = async (req, res) => {
       new: true,
     });
 
+    productF_image_url = "";
     productGalleryImagesUrls = [];
 
     if (update) {
