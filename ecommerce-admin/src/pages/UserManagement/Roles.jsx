@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Input, Space, Divider } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Table, Button, Input, Space, Divider, Spin } from "antd";
+import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
 import axios from "axios";
 import AddRoleModal from "./AddRoleModal";
 import EditRoleModal from "./EditRoleModal";
@@ -190,49 +190,66 @@ const Roles = () => {
   ];
 
   return (
-    <div>
-      <span style={{fontSize:"24px", fontWeight:"600"}}>Roles Management</span>
-      <Divider />
-      <div>
-        <Button
-          type="primary"
-          onClick={handleAddNew}
-          style={{ marginBottom: 16 }}
+    <>
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "300px",
+          }}
         >
-          Add New Role
-        </Button>
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+        </div>
+      ) : (
+        <div>
+          <span style={{ fontSize: "24px", fontWeight: "600" }}>
+            Roles Management
+          </span>
+          <Divider />
+          <div>
+            <Button
+              type="primary"
+              onClick={handleAddNew}
+              style={{ marginBottom: 16 }}
+            >
+              Add New Role
+            </Button>
 
-        <Table
-          columns={columns}
-          dataSource={roles}
-          loading={loading}
-          onChange={handleChange}
-        />
+            <Table
+              columns={columns}
+              dataSource={roles}
+              loading={loading}
+              onChange={handleChange}
+            />
 
-        {/* Add New Role Modal */}
-        <AddRoleModal
-          visible={addRoleModalVisible}
-          onCancel={handleAddRoleModalCancel}
-          onAdd={handleAddRoleModalAdd}
-        />
+            {/* Add New Role Modal */}
+            <AddRoleModal
+              visible={addRoleModalVisible}
+              onCancel={handleAddRoleModalCancel}
+              onAdd={handleAddRoleModalAdd}
+            />
 
-        {/* Edit Role Modal */}
-        <EditRoleModal
-          roleId={selectedRoleId}
-          visible={editModalVisible}
-          onCancel={handleEditRoleModalCancel}
-          onUpdate={handleEditRoleModalUpdate}
-        />
+            {/* Edit Role Modal */}
+            <EditRoleModal
+              roleId={selectedRoleId}
+              visible={editModalVisible}
+              onCancel={handleEditRoleModalCancel}
+              onUpdate={handleEditRoleModalUpdate}
+            />
 
-        {/* Delete Role Modal */}
-        <DeleteRoleModal
-          roleId={selectedRoleId}
-          visible={deleteModalVisible}
-          onCancel={handleDeleteRoleModalCancel}
-          onDelete={handleDeleteRoleModalDelete}
-        />
-      </div>
-    </div>
+            {/* Delete Role Modal */}
+            <DeleteRoleModal
+              roleId={selectedRoleId}
+              visible={deleteModalVisible}
+              onCancel={handleDeleteRoleModalCancel}
+              onDelete={handleDeleteRoleModalDelete}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

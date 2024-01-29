@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Input, Space, Divider } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Table, Button, Input, Space, Divider, Spin } from "antd";
+import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
 import axios from "axios";
 import AddProductModal from "./AddProductModal";
 import EditProductModal from "./EditProductModal";
@@ -131,7 +131,9 @@ const Products = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/products/getProducts");
+      const response = await axios.get(
+        "http://localhost:5000/products/getProducts"
+      );
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching units:", error);
@@ -237,50 +239,67 @@ const Products = () => {
   ];
 
   return (
-    <div>
-      <span style={{fontSize:"24px", fontWeight:"600"}}>Products Management</span>
-      <Divider />
-      <div>
-        <Button
-          type="primary"
-          onClick={handleAddNew}
-          style={{ marginBottom: 16 }}
+    <>
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "300px",
+          }}
         >
-          Add New Product
-        </Button>
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+        </div>
+      ) : (
+        <div>
+          <span style={{ fontSize: "24px", fontWeight: "600" }}>
+            Products Management
+          </span>
+          <Divider />
+          <div>
+            <Button
+              type="primary"
+              onClick={handleAddNew}
+              style={{ marginBottom: 16 }}
+            >
+              Add New Product
+            </Button>
 
-        <Table
-          columns={columns}
-          dataSource={products}
-          loading={loading}
-          onChange={handleChange}
-        />
+            <Table
+              columns={columns}
+              dataSource={products}
+              loading={loading}
+              onChange={handleChange}
+            />
 
-        {/* Add New Unit Modal */}
-        <AddProductModal
-          visible={addProductModalVisible}
-          onCancel={handleAddProductModalCancel}
-          onAdd={handleAddProductModalAdd}
-        />
+            {/* Add New Unit Modal */}
+            <AddProductModal
+              visible={addProductModalVisible}
+              onCancel={handleAddProductModalCancel}
+              onAdd={handleAddProductModalAdd}
+            />
 
-        {/* Edit Unit Modal */}
-        <EditProductModal
-          productId={selectedProductId}
-          visible={editModalVisible}
-          onCancel={handleEditProductModalCancel}
-          onUpdate={handleEditProductModalUpdate}
-        />
+            {/* Edit Unit Modal */}
+            <EditProductModal
+              productId={selectedProductId}
+              visible={editModalVisible}
+              onCancel={handleEditProductModalCancel}
+              onUpdate={handleEditProductModalUpdate}
+            />
 
-        {/* Delete Unit Modal */}
-        <DeleteProductModal
-          productId={selectedProductId}
-          visible={deleteModalVisible}
-          onCancel={handleDeleteProductModalCancel}
-          onDelete={handleDeleteProductModalDelete}
-        />
-      </div>
-    </div>
+            {/* Delete Unit Modal */}
+            <DeleteProductModal
+              productId={selectedProductId}
+              visible={deleteModalVisible}
+              onCancel={handleDeleteProductModalCancel}
+              onDelete={handleDeleteProductModalDelete}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
-}
+};
 
-export default Products
+export default Products;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Input, Space, Divider } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Table, Button, Input, Space, Divider, Spin } from "antd";
+import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
 import axios from "axios";
 import ViewUserModal from "./ViewUserModal";
 import AddUserModal from "./AddUserModal";
@@ -241,59 +241,73 @@ const Users = () => {
   ];
 
   return (
-    <div>
-      <span style={{ fontSize: "24px", fontWeight: "600" }}>
-        Users Management
-      </span>
-      <Divider />
-      <div>
-        <Button
-          type="primary"
-          onClick={handleAddNew}
-          style={{ marginBottom: 16 }}
+    <>
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "300px",
+          }}
         >
-          Add New User
-        </Button>
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+        </div>
+      ) : (
+        <div>
+          <span style={{ fontSize: "24px", fontWeight: "600" }}>
+            Users Management
+          </span>
+          <Divider />
+          <div>
+            <Button
+              type="primary"
+              onClick={handleAddNew}
+              style={{ marginBottom: 16 }}
+            >
+              Add New User
+            </Button>
 
-        <Table
-          columns={columns}
-          dataSource={users}
-          loading={loading}
-          onChange={handleChange}
-        />
+            <Table
+              columns={columns}
+              dataSource={users}
+              onChange={handleChange}
+            />
 
-        {/* View User Modal */}
-        <ViewUserModal
-          userId={selectedUserId}
-          visible={viewModalVisible}
-          onCancel={handleViewUserModalCancel}
-          onUpdate={handleViewUserModalUpdate}
-        />
+            {/* View User Modal */}
+            <ViewUserModal
+              userId={selectedUserId}
+              visible={viewModalVisible}
+              onCancel={handleViewUserModalCancel}
+              onUpdate={handleViewUserModalUpdate}
+            />
 
-        {/* Add New User Modal */}
-        <AddUserModal
-          visible={addUserModalVisible}
-          onCancel={handleAddUserModalCancel}
-          onAdd={handleAddUserModalAdd}
-        />
+            {/* Add New User Modal */}
+            <AddUserModal
+              visible={addUserModalVisible}
+              onCancel={handleAddUserModalCancel}
+              onAdd={handleAddUserModalAdd}
+            />
 
-        {/* Edit User Modal */}
-        <EditUserModal
-          userId={selectedUserId}
-          visible={editModalVisible}
-          onCancel={handleEditUserModalCancel}
-          onUpdate={handleEditUserModalUpdate}
-        />
+            {/* Edit User Modal */}
+            <EditUserModal
+              userId={selectedUserId}
+              visible={editModalVisible}
+              onCancel={handleEditUserModalCancel}
+              onUpdate={handleEditUserModalUpdate}
+            />
 
-        {/* Delete User Modal */}
-        <DeleteUserModal
-          userId={selectedUserId}
-          visible={deleteModalVisible}
-          onCancel={handleDeleteUserModalCancel}
-          onDelete={handleDeleteUserModalDelete}
-        />
-      </div>
-    </div>
+            {/* Delete User Modal */}
+            <DeleteUserModal
+              userId={selectedUserId}
+              visible={deleteModalVisible}
+              onCancel={handleDeleteUserModalCancel}
+              onDelete={handleDeleteUserModalDelete}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
