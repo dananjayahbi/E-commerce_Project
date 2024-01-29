@@ -21,7 +21,6 @@ const AddRoleModal = ({ visible, onCancel, onAdd }) => {
         ...values,
         permissions: {
           products: values.permissions.includes("products"),
-          addProduct: values.permissions.includes("addProduct"),
           category: values.permissions.includes("category"),
           units: values.permissions.includes("units"),
           brands: values.permissions.includes("brands"),
@@ -126,9 +125,6 @@ const AddRoleModal = ({ visible, onCancel, onAdd }) => {
               </Row>
               <Row>
                 <Checkbox value="products">Products</Checkbox>
-              </Row>
-              <Row>
-                <Checkbox value="addProduct">addProduct</Checkbox>
               </Row>
               <Row>
                 <Checkbox value="category">category</Checkbox>

@@ -7,10 +7,6 @@ const permissionsSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    addProduct: {
-        type: Boolean,
-        default: false,
-    },
     category: {
         type: Boolean,
         default: false,
