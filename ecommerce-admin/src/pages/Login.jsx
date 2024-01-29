@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
+import { message } from "antd";
 import * as Yup from "yup";
 import {
   Button,
@@ -18,6 +19,8 @@ const CustomTextField = ({ field, form, ...props }) => (
 
 const Login = () => {
   const [error, setError] = useState("");
+  const [token, setToken] = useState(null);
+  const [role, setRole] = useState(null);
 
   const initialValues = { emailOrUsername: "", password: "" };
 
@@ -32,24 +35,50 @@ const Login = () => {
         "http://localhost:5000/users/login",
         values
       );
-
+  
       console.log("Login successful");
-
+  
       // Store only the token in local storage
       window.localStorage.setItem("token", response.data.token);
-
+      setToken(response.data.token);
+  
+      // Store the user id in local storage
+      window.localStorage.setItem("userId", response.data.user.id);
+  
+      // Store the role in local storage
+      const role = response.data.user.role; // Get role from response
+      window.localStorage.setItem("role", role);
+      setRole(role);
+  
       // Set LoggedIn to true
       window.localStorage.setItem("LoggedIn", true);
-
-      console.log(localStorage.getItem("token"));
+  
+      // Get role permissions
+      const roleData = await axios.get(`http://localhost:5000/roles/getRoleByRoleName/${role}`,{
+        headers: {
+          Authorization: `Bearer ${response.data.token}`, // Use response token
+        },
+      });
+  
+      // Convert permissions object to array of key-value pairs, excluding the "_id" field
+      const permissionsArray = Object.entries(roleData.data.permissions[0])
+        .filter(([key]) => key !== "_id")
+        .map(([key, value]) => `${key}:${value}`);
+  
+      // Store the role permissions in local storage as a JSON array
+      window.localStorage.setItem("rolePermissions",permissionsArray); // Stringify permissions array
+  
+      console.log(localStorage.getItem("rolePermissions"));
+  
       window.location.href = "/";
     } catch (error) {
       console.error("Login failed", error);
+      message.error(error.response.data.message);
       setError("Invalid username or password");
     } finally {
       setSubmitting(false);
     }
-  };
+  };     
 
   return (
     <Container
@@ -116,6 +145,15 @@ const Login = () => {
               >
                 Sign In
               </Button>
+
+              {/* forgot password */}
+              <Typography
+                variant="body2"
+                align="center"
+                style={{ textDecoration: "none" }}
+              >
+                <a href="/sendOTP" style={{ textDecoration: "none" }}>Forgot password?</a>
+              </Typography>
             </Form>
           )}
         </Formik>

@@ -5,6 +5,7 @@ const {
     addRole,
     getRoles,
     getRoleById,
+    getRoleByRoleName,
     updateRole,
     deleteRole,
 } = require('../controllers/RoleController');
@@ -17,6 +18,9 @@ router.get('/getRoles', getRoles);
 
 //GET ROLE BY ID
 router.get('/getRoleById/:id', protect, getRoleById);
+
+//GET ROLE BY ROLE NAME
+router.get('/getRoleByRoleName/:roleName', protect, getRoleByRoleName);
 
 //UPDATE ROLE
 router.put('/updateRole/:id', protect, updateRole);

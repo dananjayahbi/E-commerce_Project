@@ -15,21 +15,4 @@ const fetchDashboardLogo = async () => {
   }
 };
 
-// LoggedIn user's data
-const loggedInUserData = async () => {
-    try {
-        const response = await fetch(
-            "http://localhost:5000/users/getLoggedInUserData"
-        );
-        if (response.ok) {
-            return response.json();
-        } else {
-            throw new Error("Failed to fetch user data");
-        }
-    } catch (error) {
-        console.error("Error fetching user data", error);
-        throw error;
-    }
-};
-
-export { fetchDashboardLogo, loggedInUserData };
+export { fetchDashboardLogo};

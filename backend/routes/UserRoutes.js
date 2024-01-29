@@ -41,10 +41,10 @@ router.put('/changePassword/:id', protect, changePassword);
 router.put('/resetPassword', resetPassword);
 
 //VERIFY OTP
-router.get('/verifyOTP', verifyOTP);
+router.post('/verifyOTP', verifyOTP);
 
 //HANDLE OTP
-router.get('/handleOTP', emailVerify);
+router.post('/handleOTP', emailVerify);
 
 //DELETE USER
 router.delete('/deleteUser/:id', protect, deleteUser);

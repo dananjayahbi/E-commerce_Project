@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { Menu, Layout } from "antd";
 import { useNavigate } from "react-router-dom";
-import { fetchDashboardLogo } from '../utils/globalExports';
+import { fetchDashboardLogo } from "../utils/globalExports";
 import errorImage from "../images/error_img.png";
 
 const { Header, Sider } = Layout;
@@ -36,6 +36,8 @@ const SideMenu = () => {
   const [current, setCurrent] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const [dashboardLogo, setDashboardLogo] = useState(null);
+  const [role, setRole] = useState(null);
+  const [rolePermissions, setRolePermissions] = useState(null);
 
   useEffect(() => {
     const getDashboardLogo = async () => {
@@ -43,8 +45,32 @@ const SideMenu = () => {
       setDashboardLogo(imageUrl);
     };
 
+    setRole(localStorage.getItem("role"));
+    setRolePermissions(localStorage.getItem("rolePermissions"));
+
     getDashboardLogo();
-  }, []); // Empty dependency array ensures the effect runs only once after the initial render
+  }, []);
+
+  // Function to check if a specific permission is true or false
+  const checkPermission = (permission) => {
+    if (!rolePermissions) {
+      return false;
+    }
+
+    // Split the rolePermissions string into an array of permissions
+    const permissionsArray = rolePermissions.split(",");
+
+    // Loop through the permissionsArray
+    for (const perm of permissionsArray) {
+      // Split each permission into key and value
+      const [key, value] = perm.split(":");
+
+      if (key === permission && value.trim().toLowerCase() === "true") {
+        return true;
+      }
+    }
+    return false;
+  };
 
   const onClick = (e) => {
     console.log("click ", e);
@@ -56,60 +82,95 @@ const SideMenu = () => {
         navigate("/");
         break;
       case "1":
-        navigate("/products");
+        if (checkPermission("products") === true) {
+          navigate("/products");
+        }
         break;
       case "3":
-        navigate("/category");
+        if (checkPermission("category") === true) {
+          navigate("/category");
+        }
         break;
       case "4":
-        navigate("/units");
+        if (checkPermission("units") === true) {
+          navigate("/units");
+        }
         break;
       case "5":
-        navigate("/brands");
+        if (checkPermission("brands") === true) {
+          navigate("/brands");
+        }
         break;
       case "6":
-        navigate("/orders");
+        if (checkPermission("orders") === true) {
+          navigate("/orders");
+        }
         break;
       case "7":
-        navigate("/sales");
+        if (checkPermission("sales") === true) {
+          navigate("/sales");
+        }
         break;
       case "8":
-        navigate("/newSale");
+        if (checkPermission("newSale") === true) {
+          navigate("/newSale");
+        }
         break;
       case "9":
-        navigate("/customers");
+        if (checkPermission("customers") === true) {
+          navigate("/customers");
+        }
         break;
       case "10":
-        navigate("/users");
+        if (checkPermission("users") === true) {
+          navigate("/users");
+        }
         break;
       case "11":
-        navigate("/roles");
+        if (checkPermission("roles") === true) {
+          navigate("/roles");
+        }
         break;
       case "12":
-        navigate("/salesReport");
+        if (checkPermission("salesReport") === true) {
+          navigate("/salesReport");
+        }
         break;
       case "13":
-        navigate("/inventoryReport");
+        if (checkPermission("inventoryReport") === true) {
+          navigate("/inventoryReport");
+        }
         break;
       case "14":
-        navigate("/productsReport");
+        if (checkPermission("productsReport") === true) {
+          navigate("/productsReport");
+        }
         break;
       case "15":
-        navigate("/productQuantityAlerts");
+        if (checkPermission("productQuantityAlerts") === true) {
+          navigate("/productQuantityAlerts");
+        }
         break;
       case "16":
-        navigate("/systemSettings");
+        if (checkPermission("systemSettings") === true) {
+          navigate("/systemSettings");
+        }
         break;
       case "17":
-        navigate("/storeSettings");
+        if (checkPermission("storeSettings") === true) {
+          navigate("/storeSettings");
+        }
         break;
       case "18":
-        navigate("/emailTemplates");
+        if (checkPermission("emailTemplates") === true) {
+          navigate("/emailTemplates");
+        }
         break;
       case "19":
-        navigate("/backup");
+        if (checkPermission("backup") === true) {
+          navigate("/backup");
+        }
         break;
-      // Add more cases as needed
       default:
         break;
     }
@@ -129,7 +190,13 @@ const SideMenu = () => {
         <Header
           style={{ color: "#fff", display: "flex", justifyContent: "center" }}
         >
-          <img src={dashboardLogo ? dashboardLogo : errorImage} alt="Logo" width="120px" height="120px" style={{ borderRadius: errorImage ? "20%" : "0" }} />
+          <img
+            src={dashboardLogo ? dashboardLogo : errorImage}
+            alt="Logo"
+            width="120px"
+            height="120px"
+            style={{ borderRadius: errorImage ? "20%" : "0" }}
+          />
         </Header>
       </Layout>
       <Menu
@@ -146,106 +213,170 @@ const SideMenu = () => {
         </Menu.Item>
 
         {/* Navigation One with sub-items */}
-        <Menu.SubMenu
-          key="sub1"
-          icon={<PackageSearch size={20} />}
-          title="Products Management"
-        >
-          <Menu.Item key="1" icon={<GanttChartSquare size={15} />}>
-            Products
-          </Menu.Item>
-          <Menu.Item key="3" icon={<Layers3 size={15} />}>
-            Category
-          </Menu.Item>
-          <Menu.Item key="4" icon={<Ruler size={15} />}>
-            Units
-          </Menu.Item>
-          <Menu.Item key="5" icon={<Target size={15} />}>
-            Brands
-          </Menu.Item>
-        </Menu.SubMenu>
+        {(checkPermission("products") === true ||
+          checkPermission("category") === true ||
+          checkPermission("units") === true ||
+          checkPermission("brands") === true) && (
+          <Menu.SubMenu
+            key="sub1"
+            icon={<PackageSearch size={20} />}
+            title="Products Management"
+          >
+            {checkPermission("products") === true && (
+              <Menu.Item key="1" icon={<GanttChartSquare size={15} />}>
+                Products
+              </Menu.Item>
+            )}
+            {checkPermission("category") === true && (
+              <Menu.Item key="3" icon={<Layers3 size={15} />}>
+                Category
+              </Menu.Item>
+            )}
+            {checkPermission("units") === true && (
+              <Menu.Item key="4" icon={<Ruler size={15} />}>
+                Units
+              </Menu.Item>
+            )}
+            {checkPermission("brands") === true && (
+              <Menu.Item key="5" icon={<Target size={15} />}>
+                Brands
+              </Menu.Item>
+            )}
+          </Menu.SubMenu>
+        )}
 
         {/* Navigation Two with sub-items */}
-        <Menu.SubMenu
-          key="sub2"
-          icon={<PercentDiamond size={20} />}
-          title="Orders Management"
-        >
-          <Menu.Item key="6" icon={<GanttChartSquare size={15} />}>
-            Orders
-          </Menu.Item>
-        </Menu.SubMenu>
+        {checkPermission("orders") === true && (
+          <Menu.SubMenu
+            key="sub2"
+            icon={<PercentDiamond size={20} />}
+            title="Orders Management"
+          >
+            {checkPermission("orders") === true && (
+              <Menu.Item key="6" icon={<GanttChartSquare size={15} />}>
+                Orders
+              </Menu.Item>
+            )}
+          </Menu.SubMenu>
+        )}
 
-        {/* Navigation Three with sub-items */}
-        <Menu.SubMenu
-          key="sub3"
-          icon={<LineChart size={20} />}
-          title="Sales Management"
-        >
-          <Menu.Item key="7" icon={<Rows4 size={15} />}>
-            Sales
-          </Menu.Item>
-          <Menu.Item key="8" icon={<PlusCircle size={15} />}>
-            New Sale
-          </Menu.Item>
-        </Menu.SubMenu>
+        {(checkPermission("sales") === true ||
+          checkPermission("newSale") === true) && (
+          <Menu.SubMenu
+            key="sub3"
+            icon={<LineChart size={20} />}
+            title="Sales Management"
+          >
+            {checkPermission("sales") === true && (
+              <Menu.Item key="7" icon={<Rows4 size={15} />}>
+                Sales
+              </Menu.Item>
+            )}
+            {checkPermission("newSale") === true && (
+              <Menu.Item key="8" icon={<PlusCircle size={15} />}>
+                New Sale
+              </Menu.Item>
+            )}
+          </Menu.SubMenu>
+        )}
 
         {/* Navigation Four with sub-items */}
-        <Menu.SubMenu key="sub4" icon={<Contact size={20} />} title="People">
-          <Menu.Item key="9" icon={<UsersRound size={15} />}>
-            Customers
-          </Menu.Item>
-        </Menu.SubMenu>
+        {checkPermission("customers") === true && (
+          <Menu.SubMenu key="sub4" icon={<Contact size={20} />} title="People">
+            {checkPermission("customers") === true && (
+              <Menu.Item key="9" icon={<UsersRound size={15} />}>
+                Customers
+              </Menu.Item>
+            )}
+          </Menu.SubMenu>
+        )}
 
         {/* Navigation Five with sub-items */}
-        <Menu.SubMenu
-          key="sub5"
-          icon={<UserRoundCog size={20} />}
-          title="User Management"
-        >
-          <Menu.Item key="10" icon={<Users size={15} />}>
-            Users
-          </Menu.Item>
-          <Menu.Item key="11" icon={<UserCheck size={15} />}>
-            Roles
-          </Menu.Item>
-        </Menu.SubMenu>
+        {(checkPermission("users") === true ||
+          checkPermission("roles") === true) && (
+          <Menu.SubMenu
+            key="sub5"
+            icon={<UserRoundCog size={20} />}
+            title="User Management"
+          >
+            {checkPermission("users") === true && (
+              <Menu.Item key="10" icon={<Users size={15} />}>
+                Users
+              </Menu.Item>
+            )}
+            {checkPermission("roles") === true && (
+              <Menu.Item key="11" icon={<UserCheck size={15} />}>
+                Roles
+              </Menu.Item>
+            )}
+          </Menu.SubMenu>
+        )}
 
         {/* Navigation Six with sub-items */}
-        <Menu.SubMenu
-          key="sub6"
-          icon={<BarChartBig size={20} />}
-          title="Reports"
-        >
-          <Menu.Item key="12" icon={<FileBarChart size={15} />}>
-            Sales Report
-          </Menu.Item>
-          <Menu.Item key="13" icon={<FileBarChart size={15} />}>
-            Inventory Report
-          </Menu.Item>
-          <Menu.Item key="14" icon={<FileBarChart size={15} />}>
-            Products Report
-          </Menu.Item>
-          <Menu.Item key="15" icon={<AlertTriangle size={15} />}>
-            Product Quantity Alerts
-          </Menu.Item>
-        </Menu.SubMenu>
+        {(checkPermission("salesReport") === true ||
+          checkPermission("inventoryReport") === true ||
+          checkPermission("productsReport") === true ||
+          checkPermission("productQuantityAlerts") === true) && (
+          <Menu.SubMenu
+            key="sub6"
+            icon={<BarChartBig size={20} />}
+            title="Reports"
+          >
+            {checkPermission("salesReport") === true && (
+              <Menu.Item key="12" icon={<FileBarChart size={15} />}>
+                Sales Report
+              </Menu.Item>
+            )}
+            {checkPermission("inventoryReport") === true && (
+              <Menu.Item key="13" icon={<FileBarChart size={15} />}>
+                Inventory Report
+              </Menu.Item>
+            )}
+            {checkPermission("productsReport") === true && (
+              <Menu.Item key="14" icon={<FileBarChart size={15} />}>
+                Products Report
+              </Menu.Item>
+            )}
+            {checkPermission("productQuantityAlerts") === true && (
+              <Menu.Item key="15" icon={<AlertTriangle size={15} />}>
+                Product Quantity Alerts
+              </Menu.Item>
+            )}
+          </Menu.SubMenu>
+        )}
 
         {/* Navigation Seven with sub-items */}
-        <Menu.SubMenu key="sub7" icon={<Settings size={20} />} title="Settings">
-          <Menu.Item key="16" icon={<Cog size={15} />}>
-            System Settings
-          </Menu.Item>
-          <Menu.Item key="17" icon={<Wrench size={15} />}>
-            Store Settings
-          </Menu.Item>
-          <Menu.Item key="18" icon={<FileCog size={15} />}>
-            Email Templates
-          </Menu.Item>
-          <Menu.Item key="19" icon={<DatabaseBackup size={15} />}>
-            Backup
-          </Menu.Item>
-        </Menu.SubMenu>
+        {(checkPermission("systemSettings") === true ||
+          checkPermission("storeSettings") === true ||
+          checkPermission("emailTemplates") === true ||
+          checkPermission("backup") === true) && (
+          <Menu.SubMenu
+            key="sub7"
+            icon={<Settings size={20} />}
+            title="Settings"
+          >
+            {checkPermission("systemSettings") === true && (
+              <Menu.Item key="16" icon={<Cog size={15} />}>
+                System Settings
+              </Menu.Item>
+            )}
+            {checkPermission("storeSettings") === true && (
+              <Menu.Item key="17" icon={<Wrench size={15} />}>
+                Store Settings
+              </Menu.Item>
+            )}
+            {checkPermission("emailTemplates") === true && (
+              <Menu.Item key="18" icon={<FileCog size={15} />}>
+                Email Templates
+              </Menu.Item>
+            )}
+            {checkPermission("backup") === true && (
+              <Menu.Item key="19" icon={<DatabaseBackup size={15} />}>
+                Backup
+              </Menu.Item>
+            )}
+          </Menu.SubMenu>
+        )}
       </Menu>
     </Sider>
   );

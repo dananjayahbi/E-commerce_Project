@@ -1,6 +1,6 @@
 import React from "react";
 import { Layout, Menu, Dropdown, Avatar, Button } from "antd";
-import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
+import { UserOutlined, LogoutOutlined  } from "@ant-design/icons";
 
 const { Header: AntHeader } = Layout;
 
@@ -10,8 +10,15 @@ const Header = () => {
     window.location.href = "/login";
   };
 
+  const handleProfile = () => {
+    window.location.href = "/userProfile";
+  }
+
   const menu = (
     <Menu>
+      <Menu.Item key="Profile" icon={<UserOutlined />}>
+        <Button onClick={handleProfile} style={{border:"none"}}>Profile</Button>
+      </Menu.Item>
       <Menu.Item key="sign-out" icon={<LogoutOutlined />}>
         <Button onClick={handleSignOut} style={{border:"none"}}>Sign Out</Button>
       </Menu.Item>

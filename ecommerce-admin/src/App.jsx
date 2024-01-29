@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import PwResetSendOTP from "./pages/PwResetSendOTP";
+import PwResetVerifyOTP from "./pages/PwResetVerifyOTP";
+import PwReset from "./pages/PwReset";
 import axios from "axios";
 import "./App.css";
 
@@ -65,6 +68,9 @@ function App() {
           </>
         )}
         <Route path="/login" element={<Login />} />
+        <Route path="/sendOTP" element={<PwResetSendOTP />} />
+        <Route path="/verifyOTP" element={<PwResetVerifyOTP />} />
+        <Route path="/PwReset" element={<PwReset />} />
       </Routes>
     </>
   );

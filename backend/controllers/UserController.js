@@ -192,6 +192,10 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email/username" });
     }
 
+    if (user.isActive === false) {
+      return res.status(400).json({ message: "User is not active" });
+    }
+
     // Check password
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
@@ -341,7 +345,7 @@ const updateUser = async (req, res) => {
         ? profile_image_url
         : userFetch.profileImage,
       NIC: NIC ? NIC : userFetch.NIC,
-      isActive: isActive ? isActive : userFetch.isActive,
+      isActive: isActive !== undefined ? isActive : userFetch.isActive,
       updatedAt: Date.now(),
     };
 
@@ -443,7 +447,7 @@ const sendOTP = async (email, otp) => {
 // Function to handle OTP verification
 const verifyOTP = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ otp: req.body.otp });
 
     if (user) {
       if (user.otp === req.body.otp) {
@@ -455,12 +459,16 @@ const verifyOTP = async (req, res) => {
         // Reset the OTP to blank after successful verification
         await user.save();
 
-        return res.json({ message: "OTP verified successfully", status: true });
+        return res.json({
+          message: "OTP verified successfully",
+          status: true,
+          user: user,
+        });
       } else {
         return res.status(400).json({ message: "Invalid OTP", status: false });
       }
     } else {
-      return res.status(404).json({ message: "User not found", status: false });
+      return res.status(401).json({ message: "User not found", status: false });
     }
   } catch (e) {
     return res
@@ -471,6 +479,7 @@ const verifyOTP = async (req, res) => {
 
 //Handle OTP
 const emailVerify = async (req, res) => {
+  console.log(req.body);
   try {
     const user = await User.findOne({ email: req.body.email });
 
@@ -487,7 +496,7 @@ const emailVerify = async (req, res) => {
         otp: updatedUser.otp,
       });
     } else {
-      return res.status(404).json({ errorMessage: "User not found" });
+      return res.status(401).json({ errorMessage: "User not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -498,9 +507,9 @@ const emailVerify = async (req, res) => {
 //Reset password
 const resetPassword = async (req, res) => {
   try {
-    const userFetch = await User.findOne({ email: req.body.email });
+    const userFetch = await User.findOne({ _id: req.body.userId });
     if (userFetch) {
-      if (userFetch.email == req.body.email) {
+      if (userFetch._id == req.body.userId) {
         //hash the password
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(req.body.newPassword, salt);
@@ -516,9 +525,7 @@ const resetPassword = async (req, res) => {
           });
         }
       } else {
-        return res
-          .status(400)
-          .json({ message: "The email you entered does not match!" });
+        return res.status(400).json({ message: "User not found!" });
       }
     } else {
       res.status(404).json({

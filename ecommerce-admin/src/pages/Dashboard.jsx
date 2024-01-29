@@ -24,6 +24,7 @@ import StoreSettings from "../pages/Settings/StoreSettings";
 import EmailTemplates from "../pages/Settings/EmailTemplates";
 import Backup from "../pages/Settings/Backup";
 import LowWidth from "../pages/LowWidth";
+import UserProfile from "../pages/UserManagement/UserProfile";
 
 const { Content, Header: AntHeader, Footer: AntFooter } = Layout;
 
@@ -106,6 +107,7 @@ const Dashboard = () => {
                 <Route path="/storeSettings" element={<StoreSettings />} />
                 <Route path="/emailTemplates" element={<EmailTemplates />} />
                 <Route path="/backup" element={<Backup />} />
+                <Route path="/userProfile" element={<UserProfile />} />
               </Routes>
             </Content>
             <AntFooter>

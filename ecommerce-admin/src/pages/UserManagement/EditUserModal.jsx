@@ -16,7 +16,9 @@ const EditUserModal = ({ visible, onCancel, userId, onUpdate }) => {
     // Fetch roles from the server
     const fetchRoles = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/roles/getRoles");
+        const response = await axios.get(
+          "http://localhost:5000/roles/getRoles"
+        );
         setRoles(response.data);
       } catch (error) {
         console.error("Error fetching roles:", error);
@@ -227,10 +229,10 @@ const EditUserModal = ({ visible, onCancel, userId, onUpdate }) => {
             { required: true, message: "Please upload the profile image!" },
           ]}
         >
-          <div style={{display:"flex", alignItems:"center"}}>
+          <div style={{ display: "flex", alignItems: "center" }}>
             {/* Display the profile image */}
             {profileImagePreview && (
-              <div style={{marginRight: "10px"}}>
+              <div style={{ marginRight: "10px" }}>
                 <img
                   src={profileImagePreview}
                   alt="Preview of the image URL"
@@ -258,7 +260,10 @@ const EditUserModal = ({ visible, onCancel, userId, onUpdate }) => {
           label="IsActive?"
           rules={[{ required: true, message: "Please select an option" }]}
         >
-          <Input />
+          <Select placeholder="Select an option">
+            <Option value={true}>True</Option>
+            <Option value={false}>False</Option>
+          </Select>
         </Form.Item>
       </Form>
     </Modal>

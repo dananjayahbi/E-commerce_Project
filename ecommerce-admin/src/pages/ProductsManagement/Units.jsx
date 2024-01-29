@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Input, Space, Divider } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Table, Button, Input, Space, Divider, Spin } from "antd";
+import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
 import axios from "axios";
 import AddUnitModal from "./AddUnitModal";
 import EditUnitModal from "./EditUnitModal";
@@ -207,49 +207,66 @@ const Units = () => {
   ];
 
   return (
-    <div>
-      <span style={{fontSize:"24px", fontWeight:"600"}}>Units Management</span>
-      <Divider />
-      <div>
-        <Button
-          type="primary"
-          onClick={handleAddNew}
-          style={{ marginBottom: 16 }}
+    <>
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "300px",
+          }}
         >
-          Add New Unit
-        </Button>
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+        </div>
+      ) : (
+        <div>
+          <span style={{ fontSize: "24px", fontWeight: "600" }}>
+            Units Management
+          </span>
+          <Divider />
+          <div>
+            <Button
+              type="primary"
+              onClick={handleAddNew}
+              style={{ marginBottom: 16 }}
+            >
+              Add New Unit
+            </Button>
 
-        <Table
-          columns={columns}
-          dataSource={units}
-          loading={loading}
-          onChange={handleChange}
-        />
+            <Table
+              columns={columns}
+              dataSource={units}
+              loading={loading}
+              onChange={handleChange}
+            />
 
-        {/* Add New Unit Modal */}
-        <AddUnitModal
-          visible={addUnitModalVisible}
-          onCancel={handleAddUnitModalCancel}
-          onAdd={handleAddUnitModalAdd}
-        />
+            {/* Add New Unit Modal */}
+            <AddUnitModal
+              visible={addUnitModalVisible}
+              onCancel={handleAddUnitModalCancel}
+              onAdd={handleAddUnitModalAdd}
+            />
 
-        {/* Edit Unit Modal */}
-        <EditUnitModal
-          unitId={selectedUnitId}
-          visible={editModalVisible}
-          onCancel={handleEditUnitModalCancel}
-          onUpdate={handleEditUnitModalUpdate}
-        />
+            {/* Edit Unit Modal */}
+            <EditUnitModal
+              unitId={selectedUnitId}
+              visible={editModalVisible}
+              onCancel={handleEditUnitModalCancel}
+              onUpdate={handleEditUnitModalUpdate}
+            />
 
-        {/* Delete Unit Modal */}
-        <DeleteUnitModal
-          unitId={selectedUnitId}
-          visible={deleteModalVisible}
-          onCancel={handleDeleteUnitModalCancel}
-          onDelete={handleDeleteUnitModalDelete}
-        />
-      </div>
-    </div>
+            {/* Delete Unit Modal */}
+            <DeleteUnitModal
+              unitId={selectedUnitId}
+              visible={deleteModalVisible}
+              onCancel={handleDeleteUnitModalCancel}
+              onDelete={handleDeleteUnitModalDelete}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

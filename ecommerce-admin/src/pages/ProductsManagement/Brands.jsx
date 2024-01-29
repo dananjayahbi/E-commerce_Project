@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Input, Space, Divider } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Table, Button, Input, Space, Divider, Spin } from "antd";
+import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
 import axios from "axios";
 import AddBrandModal from "./AddBrandModal";
 import EditBrandModal from "./EditBrandModal";
@@ -131,7 +131,9 @@ const Brands = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/brands/getBrands");
+      const response = await axios.get(
+        "http://localhost:5000/brands/getBrands"
+      );
       setBrands(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -204,50 +206,67 @@ const Brands = () => {
   ];
 
   return (
-    <div>
-      <span style={{fontSize:"24px", fontWeight:"600"}}>Brands Management</span>
-      <Divider />
-      <div>
-        <Button
-          type="primary"
-          onClick={handleAddNew}
-          style={{ marginBottom: 16 }}
+    <>
+    {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "300px",
+          }}
         >
-          Add New Brand
-        </Button>
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+        </div>
+      ) : (
+      <div>
+        <span style={{ fontSize: "24px", fontWeight: "600" }}>
+          Brands Management
+        </span>
+        <Divider />
+        <div>
+          <Button
+            type="primary"
+            onClick={handleAddNew}
+            style={{ marginBottom: 16 }}
+          >
+            Add New Brand
+          </Button>
 
-        <Table
-          columns={columns}
-          dataSource={brands}
-          loading={loading}
-          onChange={handleChange}
-        />
+          <Table
+            columns={columns}
+            dataSource={brands}
+            loading={loading}
+            onChange={handleChange}
+          />
 
-        {/* Add New Brand Modal */}
-        <AddBrandModal
-          visible={addBrandModalVisible}
-          onCancel={handleAddBrandModalCancel}
-          onAdd={handleAddBrandModalAdd}
-        />
+          {/* Add New Brand Modal */}
+          <AddBrandModal
+            visible={addBrandModalVisible}
+            onCancel={handleAddBrandModalCancel}
+            onAdd={handleAddBrandModalAdd}
+          />
 
-        {/* Edit Brand Modal */}
-        <EditBrandModal
-          brandId={selectedBrandId}
-          visible={editModalVisible}
-          onCancel={handleEditBrandModalCancel}
-          onUpdate={handleEditBrandModalUpdate}
-        />
+          {/* Edit Brand Modal */}
+          <EditBrandModal
+            brandId={selectedBrandId}
+            visible={editModalVisible}
+            onCancel={handleEditBrandModalCancel}
+            onUpdate={handleEditBrandModalUpdate}
+          />
 
-        {/* Delete Brand Modal */}
-        <DeleteBrandModal
-          brandId={selectedBrandId}
-          visible={deleteModalVisible}
-          onCancel={handleDeleteBrandModalCancel}
-          onDelete={handleDeleteBrandModalDelete}
-        />
+          {/* Delete Brand Modal */}
+          <DeleteBrandModal
+            brandId={selectedBrandId}
+            visible={deleteModalVisible}
+            onCancel={handleDeleteBrandModalCancel}
+            onDelete={handleDeleteBrandModalDelete}
+          />
+        </div>
       </div>
-    </div>
+      )}
+    </>
   );
-}
+};
 
-export default Brands
+export default Brands;

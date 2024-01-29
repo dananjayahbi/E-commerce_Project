@@ -67,35 +67,36 @@ const ViewUserModal = ({ userId, visible, onCancel }) => {
             </Col>
             <Col span={12}>
               <p>
-                <strong>Full Name:</strong> {userData.fullName}
+                <strong>Full Name :</strong> {userData.fullName}
               </p>
               <p>
-                <strong>Username:</strong> {userData.username}
+                <strong>Username :</strong> {userData.username}
               </p>
               <p>
-                <strong>Email:</strong> {userData.email}
+                <strong>Email :</strong> {userData.email}
               </p>
               <p>
-                <strong>Role:</strong> {userData.role}
+                <strong>Role :</strong> {userData.role}
               </p>
               <p>
-                <strong>Phone Number:</strong> {userData.phoneNumber}
+                <strong>Phone Number :</strong> {userData.phoneNumber}
               </p>
               <p>
-                <strong>NIC:</strong> {userData.NIC}
+                <strong>NIC :</strong> {userData.NIC}
               </p>
               <p>
-                <strong>Registered Date:</strong>{" "}
+                <strong>IsActive? :</strong> {userData.isActive ? "True" : "False"}
+              </p>
+              <p>
+                <strong>Registered Date :</strong>{" "}
                 {formatDate(userData.registeredDate)}
               </p>
               <p>
-                <strong>Last Logged In Date:</strong>{" "}
+                <strong>Last Logged In Date :</strong>{" "}
                 {formatDate(userData.lastLogin)}
               </p>
-              {/* Add other user details here */}
             </Col>
           </Row>
-          {/* You can add more sections or details as needed */}
         </Card>
       )}
     </Modal>

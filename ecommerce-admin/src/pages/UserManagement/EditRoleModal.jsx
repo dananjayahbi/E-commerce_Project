@@ -62,7 +62,6 @@ const EditRoleModal = ({ roleId, visible, onCancel, onUpdate }) => {
       // Create a single object with all pages and their permission states
       const permissionsObject = {
         products: values.permissions.includes("products") ? true : false,
-        addProduct: values.permissions.includes("addProduct") ? true : false,
         category: values.permissions.includes("category") ? true : false,
         units: values.permissions.includes("units") ? true : false,
         brands: values.permissions.includes("brands") ? true : false,
@@ -157,9 +156,6 @@ const EditRoleModal = ({ roleId, visible, onCancel, onUpdate }) => {
               </Row>
               <Row>
                 <Checkbox value="products">Products</Checkbox>
-              </Row>
-              <Row>
-                <Checkbox value="addProduct">addProduct</Checkbox>
               </Row>
               <Row>
                 <Checkbox value="category">category</Checkbox>

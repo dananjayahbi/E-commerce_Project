@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { PlusOutlined } from "@ant-design/icons";
-import { Modal, Upload, message } from "antd";
+import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
+import { Modal, Upload, message, Spin } from "antd";
 import errorImage from "../../images/error_img.png";
 
 const getBase64 = (file) =>
@@ -13,13 +13,14 @@ const getBase64 = (file) =>
 
 const SingleImageUpload = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
 
   useEffect(() => {
     // Fetch and display the existing 'dashboardLogo' image when component mounts
-    fetchDashboardLogo();
+    fetchDashboardLogo().finally(() => setLoading(false));
   }, []);
 
   const handleCancel = () => setPreviewOpen(false);
@@ -69,70 +70,83 @@ const SingleImageUpload = () => {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "300px",
+          }}
+        >
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+        </div>
+      ) : (
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            width: "400px",
-            border: "1px solid #d9d9d9",
-            borderRadius: "10px",
-            padding: "40px",
           }}
         >
           <div
             style={{
-              width: "400px",
-              height: "200px",
-              overflow: "hidden",
-              marginBottom: "10px",
-            }}
-          >
-            <img
-              src={previewImage ? previewImage : errorImage}
-              alt="Preview"
-              style={{ width: "100%", height: "100%", objectFit: "contain" }}
-            />
-          </div>
-          <div
-            style={{
               display: "flex",
+              flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
+              width: "400px",
+              border: "1px solid #d9d9d9",
+              borderRadius: "10px",
+              padding: "40px",
             }}
           >
-            <Upload
-              action="http://localhost:5000/systemSettings/uploadDashboardLogo"
-              listType="picture-card"
-              fileList={fileList}
-              onPreview={handlePreview}
-              onChange={handleChange}
+            <div
+              style={{
+                width: "400px",
+                height: "200px",
+                overflow: "hidden",
+                marginBottom: "10px",
+              }}
             >
-              {fileList.length === 0 && uploadButton}
-            </Upload>
+              <img
+                src={previewImage ? previewImage : errorImage}
+                alt="Preview"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Upload
+                action="http://localhost:5000/systemSettings/uploadDashboardLogo"
+                listType="picture-card"
+                fileList={fileList}
+                onPreview={handlePreview}
+                onChange={handleChange}
+              >
+                {fileList.length === 0 && uploadButton}
+              </Upload>
+            </div>
+            <Modal
+              visible={previewOpen}
+              title={previewTitle}
+              footer={null}
+              onCancel={handleCancel}
+            >
+              <img alt="example" style={{ width: "100%" }} src={previewImage} />
+            </Modal>
+            <span style={{ fontSize: "12px" }}>
+              Update the Admin Dashboard Logo here.
+            </span>
           </div>
-          <Modal
-            visible={previewOpen}
-            title={previewTitle}
-            footer={null}
-            onCancel={handleCancel}
-          >
-            <img alt="example" style={{ width: "100%" }} src={previewImage} />
-          </Modal>
-          <span style={{ fontSize: "12px" }}>
-            Update the Admin Dashboard Logo here.
-          </span>
         </div>
-      </div>
+      )}
     </>
   );
 };

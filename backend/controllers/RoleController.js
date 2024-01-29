@@ -63,6 +63,25 @@ const getRoleById = async (req, res) => {
   }
 };
 
+//Get role by roleName
+const getRoleByRoleName = async (req, res) => {
+  try {
+    const role = await Role.findOne({ roleName: req.params.roleName });
+
+    if (!role) {
+      res.status(404).json({
+        errorMessage: "Role not found",
+      });
+    } else {
+      res.json(role);
+    }
+  } catch (error) {
+    res.status(400).json({
+      errorMessage: "Something went wrong!\n" + e,
+    });
+  }
+};
+
 //Update role
 const updateRole = async (req, res) => {
   try {
@@ -139,6 +158,7 @@ module.exports = {
   addRole,
   getRoles,
   getRoleById,
+  getRoleByRoleName,
   updateRole,
   deleteRole,
 };
