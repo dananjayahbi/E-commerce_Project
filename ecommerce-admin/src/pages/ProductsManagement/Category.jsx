@@ -151,6 +151,7 @@ const Category = () => {
       title: "Category Name",
       dataIndex: "categoryName",
       key: "categoryName",
+      width: 200,
       sorter: (a, b) => a.categoryName.localeCompare(b.categoryName),
       sortOrder: sortedInfo.columnKey === "categoryName" && sortedInfo.order,
       ellipsis: true,
@@ -160,15 +161,16 @@ const Category = () => {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      width: 500,
     },
     {
       title: "Actions",
       key: "actions",
+      width: 200,
       render: (record) => (
         <span
           style={{
             display: "flex",
-            flexDirection: window.innerWidth < 870 ? "column" : "row",
           }}
         >
           <Button
@@ -221,6 +223,7 @@ const Category = () => {
               columns={columns}
               dataSource={categories}
               loading={loading}
+              scroll={{ x: 1000 }}
               onChange={handleChange}
             />
 
