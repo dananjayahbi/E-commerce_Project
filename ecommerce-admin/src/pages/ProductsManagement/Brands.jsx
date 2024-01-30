@@ -167,6 +167,7 @@ const Brands = () => {
       title: "Brand Name",
       dataIndex: "brandName",
       key: "brandName",
+      width: 250,
       sorter: (a, b) => a.brandName.localeCompare(b.brandName),
       sortOrder: sortedInfo.columnKey === "brandName" && sortedInfo.order,
       ellipsis: true,
@@ -176,15 +177,16 @@ const Brands = () => {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      width: 700,
     },
     {
       title: "Actions",
       key: "actions",
+      width: 200,
       render: (record) => (
         <span
           style={{
             display: "flex",
-            flexDirection: window.innerWidth < 870 ? "column" : "row",
           }}
         >
           <Button
@@ -237,6 +239,7 @@ const Brands = () => {
             columns={columns}
             dataSource={brands}
             loading={loading}
+            scroll={{ x: 1000 }}
             onChange={handleChange}
           />
 

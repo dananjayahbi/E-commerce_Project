@@ -152,6 +152,7 @@ const Units = () => {
       sorter: (a, b) => a.unitName.localeCompare(b.unitName),
       sortOrder: sortedInfo.columnKey === "unitName" && sortedInfo.order,
       ellipsis: true,
+      width: 200,
       ...getColumnSearchProps("unitName"),
     },
     {
@@ -161,31 +162,35 @@ const Units = () => {
       sorter: (a, b) => a.shortName.localeCompare(b.shortName),
       sortOrder: sortedInfo.columnKey === "shortName" && sortedInfo.order,
       ellipsis: true,
+      width: 200,
       ...getColumnSearchProps("shortName"),
     },
     {
       title: "Base Unit",
       dataIndex: "baseUnit",
       key: "baseUnit",
+      width: 200,
     },
     {
       title: "Operator",
       dataIndex: "operator",
       key: "operator",
+      width: 200,
     },
     {
       title: "Operation Value",
       dataIndex: "operationValue",
       key: "operationValue",
+      width: 200,
     },
     {
       title: "Actions",
       key: "actions",
+      width: 200,
       render: (record) => (
         <span
           style={{
             display: "flex",
-            flexDirection: window.innerWidth < 870 ? "column" : "row",
           }}
         >
           <Button
@@ -239,6 +244,7 @@ const Units = () => {
               dataSource={units}
               loading={loading}
               onChange={handleChange}
+              scroll={{ x: 1000 }}
             />
 
             {/* Add New Unit Modal */}

@@ -186,6 +186,7 @@ const Users = () => {
       title: "Username",
       dataIndex: "username",
       key: "username",
+      width: 250,
       sorter: (a, b) => a.username.localeCompare(b.username),
       sortOrder: sortedInfo.columnKey === "username" && sortedInfo.order,
       ellipsis: true,
@@ -195,22 +196,24 @@ const Users = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      width: 500,
       ellipsis: true,
     },
     {
       title: "Role",
       dataIndex: "role",
       key: "role",
+      width: 200,
       ellipsis: true,
     },
     {
       title: "Actions",
       key: "actions",
+      width: 200,
       render: (record) => (
         <span
           style={{
             display: "flex",
-            flexDirection: window.innerWidth < 870 ? "column" : "row",
           }}
         >
           <Button
@@ -271,6 +274,7 @@ const Users = () => {
             <Table
               columns={columns}
               dataSource={users}
+              scroll={{ x: 1000 }}
               onChange={handleChange}
             />
 

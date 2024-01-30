@@ -167,6 +167,7 @@ const Products = () => {
       title: "Product Name",
       dataIndex: "productName",
       key: "productName",
+      width: 200,
       sorter: (a, b) => a.productName.localeCompare(b.productName),
       sortOrder: sortedInfo.columnKey === "productName" && sortedInfo.order,
       ellipsis: true,
@@ -176,6 +177,7 @@ const Products = () => {
       title: "Product Code",
       dataIndex: "productCode",
       key: "productCode",
+      width: 200,
       sorter: (a, b) => a.productCode.localeCompare(b.productCode),
       sortOrder: sortedInfo.columnKey === "productCode" && sortedInfo.order,
       ellipsis: true,
@@ -185,6 +187,7 @@ const Products = () => {
       title: "Category",
       dataIndex: "category",
       key: "category",
+      width: 200,
       sorter: (a, b) => a.category.localeCompare(b.category),
       sortOrder: sortedInfo.columnKey === "category" && sortedInfo.order,
       ellipsis: true,
@@ -194,6 +197,7 @@ const Products = () => {
       title: "Brand",
       dataIndex: "brand",
       key: "brand",
+      width: 200,
       sorter: (a, b) => a.brand.localeCompare(b.brand),
       sortOrder: sortedInfo.columnKey === "brand" && sortedInfo.order,
       ellipsis: true,
@@ -203,21 +207,23 @@ const Products = () => {
       title: "Selling Price",
       dataIndex: "sellingPrice",
       key: "sellingPrice",
+      width: 200,
       render: (sellingPrice) => `Rs. ${parseFloat(sellingPrice).toFixed(2)}`, //change the format of selling price to Rs. 0.00
     },
     {
       title: "Stocks Available",
       dataIndex: "stocks",
       key: "stocks",
+      width: 200,
     },
     {
       title: "Actions",
       key: "actions",
+      width: 200,
       render: (record) => (
         <span
           style={{
             display: "flex",
-            flexDirection: window.innerWidth < 870 ? "column" : "row",
           }}
         >
           <Button
@@ -270,6 +276,7 @@ const Products = () => {
               columns={columns}
               dataSource={products}
               loading={loading}
+              scroll={{ x: 1000 }}
               onChange={handleChange}
             />
 

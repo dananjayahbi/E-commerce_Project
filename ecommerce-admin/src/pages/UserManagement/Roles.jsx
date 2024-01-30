@@ -149,6 +149,7 @@ const Roles = () => {
       title: "Role Name",
       dataIndex: "roleName",
       key: "roleName",
+      width: 200,
       sorter: (a, b) => a.roleName.localeCompare(b.roleName),
       sortOrder: sortedInfo.columnKey === "roleName" && sortedInfo.order,
       ellipsis: true,
@@ -158,17 +159,18 @@ const Roles = () => {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      width: 500,
       ellipsis: true,
       // No search functionality for the "Description" field
     },
     {
       title: "Actions",
       key: "actions",
+      width: 200,
       render: (record) => (
         <span
           style={{
             display: "flex",
-            flexDirection: window.innerWidth < 870 ? "column" : "row",
           }}
         >
           <Button
@@ -221,6 +223,7 @@ const Roles = () => {
               columns={columns}
               dataSource={roles}
               loading={loading}
+              scroll={{ x: 1000 }}
               onChange={handleChange}
             />
 
