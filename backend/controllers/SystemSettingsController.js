@@ -91,7 +91,13 @@ const getDashboardLogo = (req, res) => {
   }
 };
 
+// A function to give the responce to the system online checker
+const checkSystemOnline = (req, res) => {
+  return res.status(200).json({ online: true });
+};
+
 module.exports = {
   uploadDashboardLogo,
   getDashboardLogo,
+  checkSystemOnline,
 };
