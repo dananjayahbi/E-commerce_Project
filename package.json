@@ -6,8 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "ecommerce-admin": "cd ecommerce-admin && npm run dev",
+    "ecommerce-store": "cd ecommerce-store && npm run dev",
     "backend": "cd backend && npm run dev",
-    "dev": "concurrently  \"npm run backend\" \"npm run ecommerce-admin\""
+    "dev": "concurrently  \"npm run backend\" \"npm run ecommerce-admin\" \"npm run ecommerce-store\""
   },
   "keywords": [],
   "author": "Dananjaya",
