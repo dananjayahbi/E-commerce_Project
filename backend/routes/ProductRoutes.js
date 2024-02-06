@@ -9,6 +9,7 @@ const {
   getProductById,
   updateProduct,
   deleteProduct,
+  searchProducts,
 } = require("../controllers/ProductController");
 
 //ADD PRODUCT
@@ -31,5 +32,8 @@ router.post("/uploadFeaturedProductImage", uploadFeaturedProductImage);
 
 //UPLOAD MULTIPLE PRODUCT IMAGES
 router.post("/uploadMultipleProductImages", uploadMultipleProductImages);
+
+//SEARCH PRODUCTS
+router.post("/searchProducts", searchProducts);
 
 module.exports = router;

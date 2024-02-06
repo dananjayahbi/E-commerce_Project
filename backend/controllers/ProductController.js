@@ -74,7 +74,9 @@ const multiStorage = multer.diskStorage({
     cb(null, path.join(__dirname, "../images/temp_images"));
   },
   filename: (req, file, cb) => {
-    const randomNumber = Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
+    const randomNumber = Math.floor(Math.random() * 1000000)
+      .toString()
+      .padStart(6, "0");
     const ext = path.extname(file.originalname);
     const fileName = "PI" + randomNumber + ext;
     cb(null, fileName);
@@ -383,7 +385,7 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    console.log(productGalleryImagesUrls)
+    console.log(productGalleryImagesUrls);
 
     // Update product data
     const updateData = {
@@ -520,6 +522,35 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+// Search for products (product name or(and) category)
+const searchProducts = async (req, res) => {
+  try {
+    let query = {};
+
+    // Check if category is provided in the request body
+    if (req.body.category) {
+      query.category = req.body.category;
+    }
+
+    const searchText = req.body.searchText;
+
+    // Construct regular expression for case-insensitive search
+    const searchRegex = new RegExp(searchText, "i");
+
+    // Add productName and optional category to the query
+    query.productName = { $regex: searchRegex };
+
+    // Query the database for products matching the searchText in productName field
+    const products = await Product.find(query);
+
+    res.json({ success: true, products });
+  } catch (error) {
+    // Handle errors
+    console.error("Error searching products:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 module.exports = {
   uploadFeaturedProductImage,
   uploadMultipleProductImages,
@@ -528,4 +559,5 @@ module.exports = {
   getProductById,
   updateProduct,
   deleteProduct,
+  searchProducts,
 };
