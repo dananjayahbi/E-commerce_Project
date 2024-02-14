@@ -1,26 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import AboutUs from "./pages/AboutUs";
 import Header from "./partials/Header";
 
-import SearchBar from "./partials/SearchBar";
-
 const App = () => {
+  const [searchResults, setSearchResults] = useState([]);
+
+  // Function to update search results
+  const updateSearchResults = (results) => {
+    setSearchResults(results);
+  };
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Header />
+        <Header updateSearchResults={updateSearchResults} />
       </div>
-      <div
-        style={{
-          padding: "0 48px",
-        }}
-      >
+      <div>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/aboutUs" element={<AboutUs />} />
-          <Route path="/searchBar" element={<SearchBar />} />
         </Routes>
       </div>
       <div>{/* <h2>Footer</h2> */}</div>
