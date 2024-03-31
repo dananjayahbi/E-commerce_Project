@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
   res.send({ message: "Hello World!" }); 
 });
 
-app.use("/us  ers", require("./routes/UserRoutes"));
+app.use("/users", require("./routes/UserRoutes"));
 app.use("/roles", require("./routes/RoleRoutes"));
 app.use("/systemSettings", require("./routes/SystemSettingsRoutes"));
 app.use("/units", require("./routes/UnitRoutes"));
