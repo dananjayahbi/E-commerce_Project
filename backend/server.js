@@ -14,7 +14,7 @@ app.use(express.json());
 
 //Setting up routing
 app.get("/", (req, res) => {
-  res.send({ message: "Hello World!" }); 
+  res.send({ message: "Hello World!" });
 });
 
 app.use("/users", require("./routes/UserRoutes"));
@@ -28,7 +28,6 @@ app.use("/products", require("./routes/ProductRoutes"));
 app.listen(PORT, () => {
   console.log("Server up with port : " + PORT);
 });
-
 
 //Setting up the database connection
 const URL = process.env.MONGODB_URL;
