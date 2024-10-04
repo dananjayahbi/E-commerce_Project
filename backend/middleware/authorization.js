@@ -4,39 +4,39 @@ const User = require("../models/User.model");
 const protect = async (req, res, next) => {
   let token;
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     try {
-      //Get token from header
+      // Get token from header
       token = req.headers.authorization.split(" ")[1];
+      console.log("Token:", token);
 
-      //Verify the token
-      const user = jwt.verify(token, process.env.JWT_SECRET, (err, res) => {
-        if (err) {
-          return "Token expired";
-        }
-        return res;
+      // Verify the token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log("Decoded Token:", decoded);
+
+      console.log("User ID:", decoded.id)
+
+      // Get user from the token using Sequelize
+      req.user = await User.findById(decoded.id, {
+        attributes: { exclude: ["password"] },
       });
+      console.log("User:", req.user);
 
-      if (user == "Token expired") {
-        return res.send({ status: "Error", data: "Token expired" });
+      if (!req.user) {
+        return res.status(404).json({ status: "Error", data: "User not found" });
       }
-
-      //Get user from the token
-      req.user = await User.findById(user.id).select("-password");
 
       next();
     } catch (error) {
-      res.status(401);
-      res.json("Not authorized");
+      console.error("JWT Verification Error:", error);
+      if (error.name === "TokenExpiredError") {
+        return res.status(401).json({ status: "Error", data: "Token expired" });
+      } else {
+        return res.status(401).json({ status: "Error", data: "Invalid token" });
+      }
     }
-  }
-
-  if (!token) {
-    res.status(401);
-    res.json("No token!");
+  } else {
+    res.status(401).json("No token!");
   }
 };
 
